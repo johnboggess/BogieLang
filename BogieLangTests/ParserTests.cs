@@ -52,7 +52,7 @@ namespace Tests
             Assert.True(parser.NumberOfSyntaxErrors == 0);
 
 
-            txt = "\"asd899asd\"";
+            txt = "\"asd8 99asd\"";
             inputStream = new AntlrInputStream(txt);
             lexer = new BogieLangLexer(inputStream);
             lexer.AddErrorListener(new ParserErrorHandler<int>());
@@ -173,6 +173,32 @@ namespace Tests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(functionCallContext);
             Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "funcCall(10.0,funcCall2())";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            functionCallContext = parser.functionCall();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(functionCallContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+            
+            txt = " funcCall\t(10.0\n,\rfuncCall2() \n\r\t)";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            functionCallContext = parser.functionCall();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(functionCallContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
         }
 
         [Test]
@@ -192,6 +218,19 @@ namespace Tests
 
 
             txt = "var=funcCall(\"arg\")";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            VarDefinitionContext = parser.varDefinition();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(VarDefinitionContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = " \t     \nvar \t     \n= \t     \nfuncCall(123) \t     \n";
             inputStream = new AntlrInputStream(txt);
             lexer = new BogieLangLexer(inputStream);
             lexer.AddErrorListener(new ParserErrorHandler<int>());
@@ -244,6 +283,19 @@ namespace Tests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(VarDeclarationContext);
             Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = " \t     \nint \t     \nvar \t     \n= \t     \nfuncCall() \t     \n";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            VarDeclarationContext = parser.varDeclaration();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(VarDeclarationContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
         }
 
         [Test]
@@ -263,6 +315,18 @@ namespace Tests
 
 
             txt = "return 10.0";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            FunctionReturnContext = parser.functionReturn();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(FunctionReturnContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+            txt = " \t     \nreturn \t     \nabc \t     \n";
             inputStream = new AntlrInputStream(txt);
             lexer = new BogieLangLexer(inputStream);
             lexer.AddErrorListener(new ParserErrorHandler<int>());
@@ -310,6 +374,28 @@ namespace Tests
                 "\nfuncCall(lol)" +
                 "\nreturn funcCall()" +
                 "\n}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            FunctionDefinitionContext = parser.functionDefinition();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(FunctionDefinitionContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = @"
+    void  funcName      (int abc,
+                    string str,  void lol)
+{
+    int intvar
+    int intvar=123
+    intvar=0.1
+    funcCall(lol)
+    return funcCall()
+}";
             inputStream = new AntlrInputStream(txt);
             lexer = new BogieLangLexer(inputStream);
             lexer.AddErrorListener(new ParserErrorHandler<int>());
