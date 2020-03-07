@@ -405,6 +405,68 @@ namespace Tests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(BodyContext);
             Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "if(1){int b}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(BodyContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+        }
+
+        [Test]
+        public void IfTests()
+        {
+            string txt = "if(true){}";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BogieLangParser.IfControlContext IfControlContext = parser.ifControl();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(IfControlContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "if(true){int b=0}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            IfControlContext = parser.ifControl();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(IfControlContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = @"if(true)
+{
+    int b=0
+    b = 1
+    funcCall(b)
+    if(false){return 1}
+    return 0
+}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            IfControlContext = parser.ifControl();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(IfControlContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
         }
 
         [Test]
