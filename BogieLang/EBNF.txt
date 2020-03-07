@@ -1,5 +1,6 @@
 ﻿Program ::= {functionDefinition}
 functionDefinition ::= TYPE " " IDENTIFIER"(" [ ( TYPE " " IDENTIFIER )  { "," ( TYPE " " IDENTIFIER ) } ] ")" "{" { body NEWLINE } "}"
+whileControl ::= "while" "(" expression ")" "{" { body NEWLINE } "}"
 ifControl ::= "if(" expression "){" { body NEWLINE } "}"
 body ::= (varDeclaration | varDefinition | functionCall | functionReturn | ifControl )
 functionReturn ::= "return " expression

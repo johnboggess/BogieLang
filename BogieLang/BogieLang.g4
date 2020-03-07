@@ -5,8 +5,9 @@ grammar BogieLang;
  */
 program				:		(functionDefinition)*;
 functionDefinition	:		TYPE IDENTIFIER '(' ( ( TYPE IDENTIFIER )  (',' ( TYPE IDENTIFIER ) )* )? ')' '{' body* '}' ;
+whileControl		:		'while' '(' expression ')' '{' body* '}';
 ifControl			:		'if' '(' expression ')' '{' body* '}';
-body				:		(varDeclaration | varDefinition | functionCall | functionReturn | ifControl);
+body				:		(varDeclaration | varDefinition | functionCall | functionReturn | ifControl | whileControl);
 functionReturn		:		'return' expression;
 varDeclaration		:		TYPE IDENTIFIER ( '=' expression )?;
 varDefinition		:		IDENTIFIER '=' expression;
