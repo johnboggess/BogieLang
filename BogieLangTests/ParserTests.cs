@@ -245,5 +245,130 @@ namespace Tests
             visitor.Visit(VarDeclarationContext);
             Assert.True(parser.NumberOfSyntaxErrors == 0);
         }
+
+        [Test]
+        public void FunctionReturnTests()
+        {
+            string txt = "return abc";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BogieLangParser.FunctionReturnContext FunctionReturnContext = parser.functionReturn();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(FunctionReturnContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "return 10.0";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            FunctionReturnContext = parser.functionReturn();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(FunctionReturnContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+        }
+
+        [Test]
+        public void FunctionDefinitionTests()
+        {
+            string txt = "void funcName(){}";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BogieLangParser.FunctionDefinitionContext FunctionDefinitionContext = parser.functionDefinition();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(FunctionDefinitionContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "void funcName(int abc,string str,void lol){}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            FunctionDefinitionContext = parser.functionDefinition();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(FunctionDefinitionContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "void funcName(int abc,string str,void lol){int intvar" +
+                "\nint intvar=123" +
+                "\nintvar=0.1" +
+                "\nfuncCall(lol)" +
+                "\nreturn funcCall()" +
+                "\n}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            FunctionDefinitionContext = parser.functionDefinition();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(FunctionDefinitionContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+        }
+
+        [Test]
+        public void ProgramTests()
+        {
+            string txt = "void funcName(){}";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BogieLangParser.ProgramContext ProgramContext = parser.program();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(ProgramContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "void funcName(int abc,string str,void lol){}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            ProgramContext = parser.program();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(ProgramContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "void funcName(){}" +
+                "void funcName(int abc,string str,void lol){}" +
+                "void funcName(int abc,string str,void lol){int intvar" +
+                "\nint intvar=123" +
+                "\nintvar=0.1" +
+                "\nfuncCall(lol)" +
+                "\nreturn funcCall()" +
+                "\n}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            ProgramContext = parser.program();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(ProgramContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+        }
     }
 }
