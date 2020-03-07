@@ -131,6 +131,19 @@ namespace Tests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
             Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "VarName + 1+ true*0";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            expressionContext = parser.expression();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(expressionContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
         }
 
         [Test]

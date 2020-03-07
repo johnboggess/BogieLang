@@ -9,7 +9,7 @@ functionReturn		:		'return' expression;
 varDeclaration		:		TYPE IDENTIFIER ( '=' expression )?;
 varDefinition		:		IDENTIFIER '=' expression;
 functionCall		:		IDENTIFIER '(' ( expression  (',' expression)* )? ')';
-expression			:		IDENTIFIER | literal | functionCall;
+expression			:		(IDENTIFIER | literal | functionCall) (OPERATOR expression)?;
 literal				:		REAL | INTEGER | BOOL | STRING;
 
 /*
