@@ -353,6 +353,61 @@ namespace Tests
         }
 
         [Test]
+        public void BodyTests()
+        {
+            string txt = "int b=true";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BogieLangParser.BodyContext BodyContext = parser.body();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(BodyContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "abc=123";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(BodyContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "func()";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(BodyContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "return 0";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(BodyContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+        }
+
+        [Test]
         public void FunctionDefinitionTests()
         {
             string txt = "void funcName(){}";

@@ -4,7 +4,8 @@ grammar BogieLang;
  * Parser Rules
  */
 program				:		(functionDefinition)*;
-functionDefinition	:		TYPE IDENTIFIER '(' ( ( TYPE IDENTIFIER )  (',' ( TYPE IDENTIFIER ) )* )? ')' '{' ( (varDeclaration | varDefinition | functionCall | functionReturn ) )* '}' ;
+functionDefinition	:		TYPE IDENTIFIER '(' ( ( TYPE IDENTIFIER )  (',' ( TYPE IDENTIFIER ) )* )? ')' '{' body* '}' ;
+body				:		(varDeclaration | varDefinition | functionCall | functionReturn);
 functionReturn		:		'return' expression;
 varDeclaration		:		TYPE IDENTIFIER ( '=' expression )?;
 varDefinition		:		IDENTIFIER '=' expression;
