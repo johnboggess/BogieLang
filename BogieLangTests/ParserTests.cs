@@ -1,7 +1,6 @@
-using NUnit.Framework;
 using Antlr4.Runtime;
-
 using BogieLang;
+using NUnit.Framework;
 namespace Tests
 {
     public class Tests
@@ -202,6 +201,48 @@ namespace Tests
             VarDefinitionContext = parser.varDefinition();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(VarDefinitionContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+        }
+
+        [Test]
+        public void VarDeclarationTests()
+        {
+            string txt = "int var";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BogieLangParser.VarDeclarationContext VarDeclarationContext = parser.varDeclaration();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(VarDeclarationContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "int var=123";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            VarDeclarationContext = parser.varDeclaration();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(VarDeclarationContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "int var=funcCall()";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            VarDeclarationContext = parser.varDeclaration();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(VarDeclarationContext);
             Assert.True(parser.NumberOfSyntaxErrors == 0);
         }
     }

@@ -3,6 +3,7 @@ grammar BogieLang;
 /*
  * Parser Rules
  */
+varDeclaration	:		TYPE ' ' IDENTIFIER ( '=' expression )?;
 varDefinition	:		IDENTIFIER '=' expression;
 functionCall	:		IDENTIFIER '(' ( expression  (',' expression)* )? ')';
 expression		:		IDENTIFIER | literal | functionCall;
