@@ -7,7 +7,7 @@ functionCall ::= IDENTIFIER "(" [ expression  {"," expression} ] ")"
 expression ::= ( IDENTIFIER | literal | functionCall )
 literal ::= REAL | INTEGER | BOOL | STRING
 
-REAL ::= Digits +"."+Digits
+REAL ::= Digits+"."+Digits
 INTEGER ::= Digits
 BOOL ::= "false" | "true"
 STRING ::= "\"" {Alpha | Digits} "\""

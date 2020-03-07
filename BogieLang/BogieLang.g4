@@ -3,15 +3,17 @@ grammar BogieLang;
 /*
  * Parser Rules
  */
-
-compileUnit
-	:	EOF
-	;
+literal			:		REAL | INTEGER | BOOL | STRING;
 
 /*
  * Lexer Rules
  */
 
-WS
-	:	' ' -> channel(HIDDEN)
-	;
+REAL			:		[0-9]+'.'[0-9]+;
+INTEGER			:		[0-9]+;
+BOOL			:		('false' | 'true');
+STRING			:		'"'[a-zA-Z0-9]+'"';
+NEWLINE			:		('\n'|'\r')+;
+TYPE			:		('int' | 'real' | 'string' | 'bool' | 'void');
+OPERATOR		:		('+' | '-' | '*' | '/' | '^' | '==' | '!=' | '<' | '>' | '<=' | '>='); 
+IDENTIFIER		:		[A-Za-z]+[a-zA-Z0-9]*;
