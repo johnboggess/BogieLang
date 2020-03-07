@@ -1,5 +1,7 @@
 using NUnit.Framework;
+using Antlr4.Runtime;
 
+using BogieLang;
 namespace Tests
 {
     public class Tests
@@ -12,7 +14,15 @@ namespace Tests
         [Test]
         public void Test1()
         {
-            Assert.Pass();
+            string txt = "";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            
         }
     }
 }
