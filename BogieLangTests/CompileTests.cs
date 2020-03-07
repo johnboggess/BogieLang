@@ -85,5 +85,102 @@ namespace BogieLangTests
             Assert.True(literal.Bool == null);
             Assert.True(literal.String == "asd8 99asd");
         }
+
+        [Test]
+        public void ExpressionTests()
+        {
+            string txt = "1";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.ExpressionContext expressionContext = parser.expression();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(expressionContext);
+            Expression expression = Expression.Compile(expressionContext);
+            Assert.True(expression.Identifier == null);
+            Assert.True(expression.Literal.Integer == 1);
+            Assert.True(expression.Operator == null);
+            Assert.True(expression.SubExpression == null);
+
+
+            txt = "1.0";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            expressionContext = parser.expression();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(expressionContext);
+            expression = Expression.Compile(expressionContext);
+            Assert.True(expression.Identifier == null);
+            Assert.True(expression.Literal.Real == 1.0);
+            Assert.True(expression.Operator == null);
+            Assert.True(expression.SubExpression == null);
+
+
+            txt = "false";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            expressionContext = parser.expression();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(expressionContext);
+            expression = Expression.Compile(expressionContext);
+            Assert.True(expression.Identifier == null);
+            Assert.True(expression.Literal.Bool == false);
+            Assert.True(expression.Operator == null);
+            Assert.True(expression.SubExpression == null);
+
+
+            txt = "\"asd899asd\"";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            expressionContext = parser.expression();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(expressionContext);
+            expression = Expression.Compile(expressionContext);
+            Assert.True(expression.Identifier == null);
+            Assert.True(expression.Literal.String == "asd899asd");
+            Assert.True(expression.Operator == null);
+            Assert.True(expression.SubExpression == null);
+
+
+            txt = "VarName";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            expressionContext = parser.expression();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(expressionContext);
+            expression = Expression.Compile(expressionContext);
+            Assert.True(expression.Identifier == "VarName");
+            Assert.True(expression.Literal == null);
+            Assert.True(expression.Operator == null);
+            Assert.True(expression.SubExpression == null);
+
+
+            txt = "VarName + 1+ true*0";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            expressionContext = parser.expression();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(expressionContext);
+            expression = Expression.Compile(expressionContext);
+            Assert.True(expression.Identifier == "VarName");
+            Assert.True(expression.Literal == null);
+            Assert.True(expression.Operator == "+");
+            Assert.True(expression.SubExpression.Literal.Integer == 1);
+            Assert.True(expression.SubExpression.Operator == "+");
+            Assert.True(expression.SubExpression.SubExpression.Literal.Bool == true);
+            Assert.True(expression.SubExpression.SubExpression.Operator == "*");
+            Assert.True(expression.SubExpression.SubExpression.SubExpression.Literal.Integer == 0);
+        }
     }
 }

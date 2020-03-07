@@ -27,4 +27,24 @@ namespace BogieLang.Runtime
             return result;
         }
     }
+
+    public class Expression
+    {
+        public string Identifier = null;
+        public Literal Literal = null;
+        public string Operator = null;
+        public Expression SubExpression = null;
+
+        public static Expression Compile(BogieLangParser.ExpressionContext expressionContext)
+        {
+            Expression result = new Expression();
+            if (expressionContext.IDENTIFIER() != null) { result.Identifier = expressionContext.IDENTIFIER().GetText(); }
+            else if (expressionContext.literal() != null) { result.Literal = Literal.Compile(expressionContext.literal()); }
+
+            if (expressionContext.OPERATOR() != null) { result.Operator = expressionContext.OPERATOR().GetText(); }
+            if (expressionContext.expression() != null) { result.SubExpression = Expression.Compile(expressionContext.expression()); }
+
+            return result;
+        }
+    }
 }
