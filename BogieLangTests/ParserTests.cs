@@ -175,5 +175,34 @@ namespace Tests
             visitor.Visit(functionCallContext);
             Assert.True(parser.NumberOfSyntaxErrors == 0);
         }
+
+        [Test]
+        public void VarDefinitionTests()
+        {
+            string txt = "var=123";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            BogieLangParser.VarDefinitionContext VarDefinitionContext = parser.varDefinition();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(VarDefinitionContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+
+
+            txt = "var=funcCall(\"arg\")";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            lexer.AddErrorListener(new ParserErrorHandler<int>());
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            parser.AddErrorListener(new ParserErrorHandler<object>());
+            VarDefinitionContext = parser.varDefinition();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(VarDefinitionContext);
+            Assert.True(parser.NumberOfSyntaxErrors == 0);
+        }
     }
 }
