@@ -251,5 +251,34 @@ namespace BogieLangTests
             Assert.True(functionCall.Arguments[0].Literal.Real == 10.0);
             Assert.True(functionCall.Arguments[1].FunctionCall.Identifier == "funcCall2");
         }
+
+        [Test]
+        public void VarDefinitionTests()
+        {
+            string txt = "var=123";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.VarDefinitionContext varDefinitionContext = parser.varDefinition();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(varDefinitionContext);
+            VarDefinition varDefinition = VarDefinition.Compile(varDefinitionContext);
+            Assert.True(varDefinition.Identifier == "var");
+            Assert.True(varDefinition.Expression.Literal.Integer == 123);
+
+
+            txt = "var=funcCall(\"arg\")";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            varDefinitionContext = parser.varDefinition();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(varDefinitionContext);
+            varDefinition = VarDefinition.Compile(varDefinitionContext);
+            Assert.True(varDefinition.Identifier == "var");
+            Assert.True(varDefinition.Expression.FunctionCall.Identifier == "funcCall");
+        }
     }
 }

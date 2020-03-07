@@ -72,4 +72,19 @@ namespace BogieLang.Runtime
             return result;
         }
     }
+
+    public class VarDefinition
+    {
+        public string Identifier = null;
+        public Expression Expression = null;
+
+        public static VarDefinition Compile(BogieLangParser.VarDefinitionContext varDefinitionContext)
+        {
+            VarDefinition result = new VarDefinition();
+            if (varDefinitionContext.IDENTIFIER() != null) { result.Identifier = varDefinitionContext.IDENTIFIER().GetText(); }
+            if (varDefinitionContext.expression() != null) { result.Expression = Expression.Compile(varDefinitionContext.expression()); }
+
+            return result;
+        }
+    }
 }
