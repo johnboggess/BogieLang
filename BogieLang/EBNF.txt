@@ -1,0 +1,20 @@
+﻿Program ::= {functionDefinition}
+functionDefinition ::= TYPE " " IDENTIFIER"(" [ ( TYPE " " IDENTIFIER )  { "," ( TYPE " " IDENTIFIER ) } ] ")" "{" { (varDeclaration | varDefinition | functionCall | functionReturn ) NEWLINE } "}"
+functionReturn ::= "return " expression
+varDeclaration ::= TYPE " " IDENTIFIER [ "=" expression ]
+varDefinition ::= IDENTIFIER '=' expression
+functionCall ::= IDENTIFIER "(" [ expression  {"," expression} ] ")"
+expression ::= ( IDENTIFIER | literal | functionCall )
+literal ::= REAL | INTEGER | BOOL | STRING
+
+REAL ::= Digits +"."+Digits
+INTEGER ::= Digits
+BOOL ::= "false" | "true"
+STRING ::= "\"" {Alpha | Digits} "\""
+
+NEWLINE ::= ("\r" | "\n") {"\r" | "\n"}
+TYPE ::= "int" | "real" | "string" | "bool" | "void"
+OPERATOR ::= '+' | '-' | '*' | '/' | '^' | '==' | '!=' | '<' | '>' | '<=' | '>='
+IDENTIFIER ::= Alpha { Alpha | Digits }
+
+Digits ::= #'[0-9]+'
