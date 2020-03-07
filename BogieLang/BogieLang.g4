@@ -3,6 +3,7 @@ grammar BogieLang;
 /*
  * Parser Rules
  */
+expression		:		IDENTIFIER | literal;
 literal			:		REAL | INTEGER | BOOL | STRING;
 
 /*
