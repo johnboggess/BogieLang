@@ -280,5 +280,76 @@ namespace BogieLangTests
             Assert.True(varDefinition.Identifier == "var");
             Assert.True(varDefinition.Expression.FunctionCall.Identifier == "funcCall");
         }
+
+        [Test]
+        public void VarDeclarationTests()
+        {
+            string txt = "int var";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.VarDeclarationContext varDeclarationContext = parser.varDeclaration();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(varDeclarationContext);
+            VarDeclaration varDeclaration = VarDeclaration.Compile(varDeclarationContext);
+            Assert.True(varDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(varDeclaration.Identifier == "var");
+
+
+            txt = "int var=123";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            varDeclarationContext = parser.varDeclaration();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(varDeclarationContext);
+            varDeclaration = VarDeclaration.Compile(varDeclarationContext);
+            Assert.True(varDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(varDeclaration.Identifier == "var");
+            Assert.True(varDeclaration.Expression.Literal.Integer == 123);
+
+
+            txt = "int var=funcCall()";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            varDeclarationContext = parser.varDeclaration();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(varDeclarationContext);
+            varDeclaration = VarDeclaration.Compile(varDeclarationContext);
+            Assert.True(varDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(varDeclaration.Identifier == "var");
+            Assert.True(varDeclaration.Expression.FunctionCall.Identifier == "funcCall");
+        }
+
+        [Test]
+        public void FunctionReturnTests()
+        {
+            string txt = "return abc";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.FunctionReturnContext functionReturnContext = parser.functionReturn();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(functionReturnContext);
+            FunctionReturn functionReturn = FunctionReturn.Compile(functionReturnContext);
+            Assert.True(functionReturn.Expression.Identifier == "abc");
+
+
+            txt = "return 10.0";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            functionReturnContext = parser.functionReturn();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(functionReturnContext);
+            functionReturn = FunctionReturn.Compile(functionReturnContext);
+            Assert.True(functionReturn.Expression.Literal.Real == 10.0);
+        }
     }
 }

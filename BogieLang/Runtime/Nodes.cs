@@ -87,4 +87,34 @@ namespace BogieLang.Runtime
             return result;
         }
     }
+
+    public class VarDeclaration
+    {
+        public BogieLangType? BogieLangType = null;
+        public string Identifier = null;
+        public Expression Expression = null;
+
+        public static VarDeclaration Compile(BogieLangParser.VarDeclarationContext varDeclarationContext)
+        {
+            VarDeclaration result = new VarDeclaration();
+            if (varDeclarationContext.TYPE() != null) { result.BogieLangType = Runtime.BogieLangTypeHelpr.StringToType(varDeclarationContext.TYPE().GetText()); }
+            if (varDeclarationContext.IDENTIFIER() != null) { result.Identifier = varDeclarationContext.IDENTIFIER().GetText(); }
+            if (varDeclarationContext.expression() != null) { result.Expression = Expression.Compile(varDeclarationContext.expression()); }
+
+            return result;
+        }
+    }
+
+    public class FunctionReturn
+    {
+        public Expression Expression = null;
+
+        public static FunctionReturn Compile(BogieLangParser.FunctionReturnContext functionReturnContext)
+        {
+            FunctionReturn result = new FunctionReturn();
+            if (functionReturnContext.expression() != null) { result.Expression = Expression.Compile(functionReturnContext.expression()); }
+
+            return result;
+        }
+    }
 }
