@@ -117,4 +117,23 @@ namespace BogieLang.Runtime
             return result;
         }
     }
+
+    public class Body
+    {
+        public VarDeclaration VarDeclaration = null;
+        public VarDefinition VarDefinition = null;
+        public FunctionCall FunctionCall = null;
+        public FunctionReturn FunctionReturn = null;
+
+        public static Body Compile(BogieLangParser.BodyContext bodyContext)
+        {
+            Body result = new Body();
+            if (bodyContext.varDeclaration() != null) { result.VarDeclaration = VarDeclaration.Compile(bodyContext.varDeclaration()); }
+            else if (bodyContext.varDefinition() != null) { result.VarDefinition = VarDefinition.Compile(bodyContext.varDefinition()); }
+            else if (bodyContext.functionCall() != null) { result.FunctionCall = FunctionCall.Compile(bodyContext.functionCall()); }
+            else if (bodyContext.functionReturn() != null) { result.FunctionReturn = FunctionReturn.Compile(bodyContext.functionReturn()); }
+
+            return result;
+        }
+    }
 }

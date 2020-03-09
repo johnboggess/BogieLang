@@ -1,9 +1,9 @@
 using Antlr4.Runtime;
 using BogieLang;
 using NUnit.Framework;
-namespace Tests
+namespace BogieLangTests
 {
-    public class Tests
+    public class ParserTests
     {
         [SetUp]
         public void Setup()
