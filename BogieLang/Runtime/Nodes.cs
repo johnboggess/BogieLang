@@ -182,4 +182,53 @@ namespace BogieLang.Runtime
             return result;
         }
     }
+
+    public class FunctionDefinition
+    {
+        public BogieLangType? ReturnBogieLangType = null;
+        public string Identifier = null;
+        public List<Tuple<BogieLangType, string>> Parameters = new List<Tuple<BogieLangType, string>>();
+        public List<Body> Body = new List<Body>();
+
+        public static FunctionDefinition Compile(BogieLangParser.FunctionDefinitionContext functionDefinitionContext)
+        {
+            FunctionDefinition result = new FunctionDefinition();
+            
+            Antlr4.Runtime.Tree.ITerminalNode[] types = functionDefinitionContext.TYPE();
+            Antlr4.Runtime.Tree.ITerminalNode[] identifiers = functionDefinitionContext.IDENTIFIER();
+
+            result.ReturnBogieLangType = BogieLangTypeHelpr.StringToType(types[0].GetText());
+            result.Identifier = identifiers[0].GetText();
+
+            for (int i = 1; i < types.Length; i++)
+            {
+                BogieLangType bogieLangType = BogieLangTypeHelpr.StringToType(types[i].GetText());
+                string identifier = identifiers[i].GetText();
+                result.Parameters.Add(new Tuple<BogieLangType, string>(bogieLangType, identifier));
+            }
+
+            foreach (BogieLangParser.BodyContext context in functionDefinitionContext.body())
+            {
+                result.Body.Add(Runtime.Body.Compile(context));
+            }
+
+            return result;
+        }
+    }
+
+    public class Program
+    {
+        public List<FunctionDefinition> Functions = new List<FunctionDefinition>();
+
+        public static Program Compile(BogieLangParser.ProgramContext programContext)
+        {
+            Program result = new Program();
+            foreach(BogieLangParser.FunctionDefinitionContext functionDefinitionContext in programContext.functionDefinition())
+            {
+                result.Functions.Add(FunctionDefinition.Compile(functionDefinitionContext));
+            }
+
+            return result;
+        }
+    }
 }
