@@ -125,6 +125,7 @@ namespace BogieLang.Runtime
         public FunctionCall FunctionCall = null;
         public FunctionReturn FunctionReturn = null;
         public IfControl IfControl = null;
+        public WhileControl WhileControl;
 
         public static Body Compile(BogieLangParser.BodyContext bodyContext)
         {
@@ -134,6 +135,7 @@ namespace BogieLang.Runtime
             else if (bodyContext.functionCall() != null) { result.FunctionCall = FunctionCall.Compile(bodyContext.functionCall()); }
             else if (bodyContext.functionReturn() != null) { result.FunctionReturn = FunctionReturn.Compile(bodyContext.functionReturn()); }
             else if (bodyContext.ifControl() != null) { result.IfControl = IfControl.Compile(bodyContext.ifControl()); }
+            else if (bodyContext.whileControl() != null) { result.WhileControl = WhileControl.Compile(bodyContext.whileControl()); }
 
             return result;
         }
@@ -151,6 +153,27 @@ namespace BogieLang.Runtime
             if (ifControlContext.body().Length != 0)
             {
                 foreach (BogieLangParser.BodyContext context in ifControlContext.body())
+                {
+                    result.Body.Add(Runtime.Body.Compile(context));
+                }
+            }
+
+            return result;
+        }
+    }
+
+    public class WhileControl
+    {
+        public Expression Expression;
+        public List<Body> Body = new List<Body>();
+
+        public static WhileControl Compile(BogieLangParser.WhileControlContext whileControlContext)
+        {
+            WhileControl result = new WhileControl();
+            if (whileControlContext.expression() != null) { result.Expression = Expression.Compile(whileControlContext.expression()); }
+            if (whileControlContext.body().Length != 0)
+            {
+                foreach (BogieLangParser.BodyContext context in whileControlContext.body())
                 {
                     result.Body.Add(Runtime.Body.Compile(context));
                 }

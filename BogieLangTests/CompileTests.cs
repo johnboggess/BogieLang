@@ -420,7 +420,7 @@ namespace BogieLangTests
             Assert.True(body.IfControl.Body[0].VarDeclaration.Identifier == "b");
 
 
-            /*txt = "while(1){int b}";
+            txt = "while(1){int b}";
             inputStream = new AntlrInputStream(txt);
             lexer = new BogieLangLexer(inputStream);
             commonTokenStream = new CommonTokenStream(lexer);
@@ -428,7 +428,10 @@ namespace BogieLangTests
             bodyContext = parser.body();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(bodyContext);
-            Assert.True(parser.NumberOfSyntaxErrors == 0);*/
+            body = Body.Compile(bodyContext);
+            Assert.True(body.WhileControl.Expression.Literal.Integer == 1);
+            Assert.True(body.WhileControl.Body[0].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(body.WhileControl.Body[0].VarDeclaration.Identifier == "b");
         }
 
         [Test]
@@ -494,6 +497,70 @@ namespace BogieLangTests
             Assert.True(ifControl.Body[3].IfControl.Body[0].FunctionReturn.Expression.Literal.Integer == 1);
 
             Assert.True(ifControl.Body[4].FunctionReturn.Expression.Literal.Integer == 0);
+        }
+        
+        [Test]
+        public void WhileTests()
+        {
+            string txt = "while(true){}";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.WhileControlContext whileControlContext = parser.whileControl();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(whileControlContext);
+            WhileControl whileControl = WhileControl.Compile(whileControlContext);
+            Assert.True(whileControl.Expression.Literal.Bool == true);
+            Assert.True(whileControl.Body.Count == 0);
+
+
+            txt = "while(true){int b=0}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            whileControlContext = parser.whileControl();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(whileControlContext);
+            whileControl = WhileControl.Compile(whileControlContext);
+            Assert.True(whileControl.Expression.Literal.Bool == true);
+            Assert.True(whileControl.Body[0].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(whileControl.Body[0].VarDeclaration.Identifier == "b");
+            Assert.True(whileControl.Body[0].VarDeclaration.Expression.Literal.Integer == 0);
+
+
+            txt = @"while(true)
+{
+    int b=0
+    b = 1
+    funcCall(b)
+    while(false){return 1}
+    return 0
+}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            whileControlContext = parser.whileControl();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(whileControlContext);
+            whileControl = WhileControl.Compile(whileControlContext);
+            Assert.True(whileControl.Expression.Literal.Bool == true);
+            Assert.True(whileControl.Body[0].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(whileControl.Body[0].VarDeclaration.Identifier == "b");
+            Assert.True(whileControl.Body[0].VarDeclaration.Expression.Literal.Integer == 0);
+
+            Assert.True(whileControl.Body[1].VarDefinition.Identifier == "b");
+            Assert.True(whileControl.Body[1].VarDefinition.Expression.Literal.Integer == 1);
+
+            Assert.True(whileControl.Body[2].FunctionCall.Identifier == "funcCall");
+            Assert.True(whileControl.Body[2].FunctionCall.Arguments[0].Identifier == "b");
+
+            Assert.True(whileControl.Body[3].WhileControl.Expression.Literal.Bool == false);
+            Assert.True(whileControl.Body[3].WhileControl.Body[0].FunctionReturn.Expression.Literal.Integer == 1);
+
+            Assert.True(whileControl.Body[4].FunctionReturn.Expression.Literal.Integer == 0);
         }
     }
 }
