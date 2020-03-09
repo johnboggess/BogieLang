@@ -406,7 +406,7 @@ namespace BogieLangTests
             Assert.True(body.FunctionReturn.Expression.Literal.Integer == 0);
 
 
-            /*txt = "if(1){int b}";
+            txt = "if(1){int b}";
             inputStream = new AntlrInputStream(txt);
             lexer = new BogieLangLexer(inputStream);
             commonTokenStream = new CommonTokenStream(lexer);
@@ -414,10 +414,13 @@ namespace BogieLangTests
             bodyContext = parser.body();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(bodyContext);
-            Assert.True(parser.NumberOfSyntaxErrors == 0);
+            body = Body.Compile(bodyContext);
+            Assert.True(body.IfControl.Expression.Literal.Integer == 1);
+            Assert.True(body.IfControl.Body[0].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(body.IfControl.Body[0].VarDeclaration.Identifier == "b");
 
 
-            txt = "while(1){int b}";
+            /*txt = "while(1){int b}";
             inputStream = new AntlrInputStream(txt);
             lexer = new BogieLangLexer(inputStream);
             commonTokenStream = new CommonTokenStream(lexer);
@@ -426,6 +429,71 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(bodyContext);
             Assert.True(parser.NumberOfSyntaxErrors == 0);*/
+        }
+
+        [Test]
+        public void IfTests()
+        {
+            string txt = "if(true){}";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.IfControlContext ifControlContext = parser.ifControl();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(ifControlContext);
+            IfControl ifControl = IfControl.Compile(ifControlContext);
+            Assert.True(ifControl.Expression.Literal.Bool == true);
+            Assert.True(ifControl.Body.Count == 0);
+
+
+
+            txt = "if(true){int b=0}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            ifControlContext = parser.ifControl();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(ifControlContext);
+            ifControl = IfControl.Compile(ifControlContext);
+            Assert.True(ifControl.Expression.Literal.Bool == true);
+            Assert.True(ifControl.Body[0].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(ifControl.Body[0].VarDeclaration.Identifier == "b");
+            Assert.True(ifControl.Body[0].VarDeclaration.Expression.Literal.Integer == 0);
+
+
+            txt = @"if(true)
+{
+    int b=0
+    b = 1
+    funcCall(b)
+    if(false){return 1}
+    return 0
+}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            ifControlContext = parser.ifControl();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(ifControlContext);
+            ifControl = IfControl.Compile(ifControlContext);
+            Assert.True(ifControl.Expression.Literal.Bool == true);
+            Assert.True(ifControl.Body[0].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(ifControl.Body[0].VarDeclaration.Identifier == "b");
+            Assert.True(ifControl.Body[0].VarDeclaration.Expression.Literal.Integer == 0);
+
+            Assert.True(ifControl.Body[1].VarDefinition.Identifier == "b");
+            Assert.True(ifControl.Body[1].VarDefinition.Expression.Literal.Integer == 1);
+
+            Assert.True(ifControl.Body[2].FunctionCall.Identifier == "funcCall");
+            Assert.True(ifControl.Body[2].FunctionCall.Arguments[0].Identifier == "b");
+
+            Assert.True(ifControl.Body[3].IfControl.Expression.Literal.Bool == false);
+            Assert.True(ifControl.Body[3].IfControl.Body[0].FunctionReturn.Expression.Literal.Integer == 1);
+
+            Assert.True(ifControl.Body[4].FunctionReturn.Expression.Literal.Integer == 0);
         }
     }
 }

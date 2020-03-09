@@ -124,6 +124,7 @@ namespace BogieLang.Runtime
         public VarDefinition VarDefinition = null;
         public FunctionCall FunctionCall = null;
         public FunctionReturn FunctionReturn = null;
+        public IfControl IfControl = null;
 
         public static Body Compile(BogieLangParser.BodyContext bodyContext)
         {
@@ -132,6 +133,28 @@ namespace BogieLang.Runtime
             else if (bodyContext.varDefinition() != null) { result.VarDefinition = VarDefinition.Compile(bodyContext.varDefinition()); }
             else if (bodyContext.functionCall() != null) { result.FunctionCall = FunctionCall.Compile(bodyContext.functionCall()); }
             else if (bodyContext.functionReturn() != null) { result.FunctionReturn = FunctionReturn.Compile(bodyContext.functionReturn()); }
+            else if (bodyContext.ifControl() != null) { result.IfControl = IfControl.Compile(bodyContext.ifControl()); }
+
+            return result;
+        }
+    }
+
+    public class IfControl
+    {
+        public Expression Expression;
+        public List<Body> Body = new List<Body>();
+
+        public static IfControl Compile(BogieLangParser.IfControlContext ifControlContext)
+        {
+            IfControl result = new IfControl();
+            if (ifControlContext.expression() != null) { result.Expression = Expression.Compile(ifControlContext.expression()); }
+            if (ifControlContext.body().Length != 0)
+            {
+                foreach (BogieLangParser.BodyContext context in ifControlContext.body())
+                {
+                    result.Body.Add(Runtime.Body.Compile(context));
+                }
+            }
 
             return result;
         }
