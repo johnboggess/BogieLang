@@ -11,6 +11,15 @@ namespace BogieLang.Runtime
         public bool? Bool = null;
         public string String = null;
 
+        public object Execute()
+        {
+            if (Real != null) { return Real; }
+            else if (Integer != null) { return Integer; }
+            else if (Bool != null) { return Bool; }
+            else if (String != null) { return String; }
+            else { throw new Exception("Unknown literal"); }
+        }
+
         public static Literal Compile(BogieLangParser.LiteralContext literalContext)
         {
             Literal result = new Literal();
