@@ -50,7 +50,7 @@ namespace BogieLang.Runtime
             {
                 if(bogieLangType != BogieLangTypeHelpr.ObjectToType(value))
                 {
-                    throw new Exception(identifier + " is of type " + variableEnvironment[identifier].BogieLangType + ", got a " + bogieLangType);
+                    throw new Exception(identifier + " is of type " + BogieLangTypeHelpr.ObjectToType(value) + ", got a " + bogieLangType);
                 }
             }
 

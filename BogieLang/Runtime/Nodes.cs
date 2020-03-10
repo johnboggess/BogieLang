@@ -169,9 +169,15 @@ namespace BogieLang.Runtime
         public IfControl IfControl = null;
         public WhileControl WhileControl;
 
-        public object Execute()
+        public void Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
-            throw new NotImplementedException();
+            if (VarDeclaration != null) { VarDeclaration.Execute(runtimeEnvironment, variableEnvironment); }
+            else if (VarDefinition != null) { VarDefinition.Execute(runtimeEnvironment, variableEnvironment); }
+            else if (FunctionCall != null) { FunctionCall.Execute(); }
+            else if (FunctionReturn != null) { FunctionReturn.Execute(runtimeEnvironment, variableEnvironment); }
+            else if (IfControl != null) { IfControl.Execute(); }
+            else if (WhileControl != null) { WhileControl.Execute(); }
+            else { throw new NotImplementedException(); }
         }
 
         public static Body Compile(BogieLangParser.BodyContext bodyContext)

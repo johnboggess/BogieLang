@@ -339,5 +339,133 @@ namespace BogieLangTests
             functionReturn = FunctionReturn.Compile(functionReturnContext);
             Assert.True((double)functionReturn.Execute(environment, variables) == 10.0);
         }
+
+        [Test]
+        public void BodyTests()
+        {
+            VariableEnvironment variables = new VariableEnvironment();
+
+            string txt = "int b=true";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.BodyContext bodyContext = parser.body();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(bodyContext);
+            Body body = Body.Compile(bodyContext);
+            try
+            {
+                body.Execute(environment, variables);
+                Assert.True(false);
+            }
+            catch(Exception e)
+            {
+                Assert.True(true);//todo: test for a specific exception types once they are created
+            }
+
+            txt = "int b=098";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            bodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(bodyContext);
+            body = Body.Compile(bodyContext);
+            body.Execute(environment, variables);
+            Assert.True(variables["b"].BogieLangType == BogieLangType.INTEGER);
+            Assert.True(variables["b"].Identifer == "b");
+            Assert.True((int)variables["b"].Value == 98);
+
+            txt = "abc=123";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            bodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(bodyContext);
+            body = Body.Compile(bodyContext);
+            try
+            {
+                body.Execute(environment, variables);
+                Assert.True(false);
+            }
+            catch
+            {
+                Assert.True(true);//todo: test for specific exception types once they are created
+            }
+
+            variables.Add("abc", new BogieLangTypeInstance() { BogieLangType = BogieLangType.INTEGER, Identifer = "abc" });
+            txt = "abc=123";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            bodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(bodyContext);
+            body = Body.Compile(bodyContext);
+            body.Execute(environment, variables);
+            Assert.True(variables["abc"].BogieLangType == BogieLangType.INTEGER);
+            Assert.True(variables["abc"].Identifer == "abc");
+            Assert.True((int)variables["abc"].Value == 123);
+
+            //todo: test funcCall after execution of funcDefinitions are possible
+            /*txt = "func()";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            bodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(bodyContext);
+            body = Body.Compile(bodyContext);
+            body.Execute(environment, variables);
+            Assert.True(variables["abc"].BogieLangType == BogieLangType.INTEGER);
+            Assert.True(variables["abc"].Identifer == "abc");
+            Assert.True((int)variables["abc"].Value == 123);*/
+
+
+            txt = "return 0";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            bodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(bodyContext);
+            body = Body.Compile(bodyContext);
+            body.Execute(environment, variables);
+
+
+            //todo: test if after execution of ifs are possible
+            /*txt = "if(1){int b}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            bodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(bodyContext);
+            body = Body.Compile(bodyContext);
+            body.Execute(environment, variables);*/
+
+
+            //todo: test while after execution of whiles are possible
+            /*txt = "while(1){int b}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            bodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(bodyContext);
+            body = Body.Compile(bodyContext);
+            Assert.True(body.WhileControl.Expression.Literal.Integer == 1);
+            Assert.True(body.WhileControl.Body[0].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(body.WhileControl.Body[0].VarDeclaration.Identifier == "b");*/
+        }
     }
 }
