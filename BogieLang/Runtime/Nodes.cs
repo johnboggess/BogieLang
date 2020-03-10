@@ -146,9 +146,9 @@ namespace BogieLang.Runtime
     {
         public Expression Expression = null;
 
-        public object Execute()
+        public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
-            throw new NotImplementedException();
+            return Expression.Execute(runtimeEnvironment, variableEnvironment);
         }
 
         public static FunctionReturn Compile(BogieLangParser.FunctionReturnContext functionReturnContext)

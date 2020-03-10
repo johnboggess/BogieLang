@@ -310,5 +310,34 @@ namespace BogieLangTests
             Assert.True((int)variables["var"].Value == 123);
             Assert.True(variables["var"].Identifer == "var");*/
         }
+
+        [Test]
+        public void FunctionReturnTests()
+        {
+            VariableEnvironment variables = new VariableEnvironment() { { "abc", new BogieLangTypeInstance { Value = false } } };
+
+            string txt = "return abc";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.FunctionReturnContext functionReturnContext = parser.functionReturn();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(functionReturnContext);
+            FunctionReturn functionReturn = FunctionReturn.Compile(functionReturnContext);
+            Assert.True((bool)functionReturn.Execute(environment, variables) == false);
+
+            variables.Clear();
+            txt = "return 10.0";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            functionReturnContext = parser.functionReturn();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(functionReturnContext);
+            functionReturn = FunctionReturn.Compile(functionReturnContext);
+            Assert.True((double)functionReturn.Execute(environment, variables) == 10.0);
+        }
     }
 }
