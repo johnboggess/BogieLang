@@ -4,6 +4,8 @@ using System.Text;
 
 namespace BogieLang.Runtime
 {
+    using VariableEnvironment = Dictionary<string, BogieLangTypeInstance>;
+
     public class Literal
     {
         public double? Real = null;
@@ -45,6 +47,14 @@ namespace BogieLang.Runtime
         public FunctionCall FunctionCall = null;
         public Expression SubExpression = null;
 
+        public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        {
+            if (Identifier != null) { return runtimeEnvironment.GetVariableValue(Identifier, variableEnvironment); }
+            else if (Literal != null) { return Literal.Execute(); }
+            else if (FunctionCall != null) { return FunctionCall.Execute(); }
+            else { throw new Exception("Unknown expression"); }
+        }
+
         public static Expression Compile(BogieLangParser.ExpressionContext expressionContext)
         {
             Expression result = new Expression();
@@ -63,6 +73,11 @@ namespace BogieLang.Runtime
     {
         public string Identifier = null;
         public List<Expression> Arguments = new List<Expression>();
+
+        public object Execute()
+        {
+            throw new NotImplementedException();
+        }
 
         public static FunctionCall Compile(BogieLangParser.FunctionCallContext functionCallContext)
         {
@@ -87,6 +102,11 @@ namespace BogieLang.Runtime
         public string Identifier = null;
         public Expression Expression = null;
 
+        public object Execute()
+        {
+            throw new NotImplementedException();
+        }
+
         public static VarDefinition Compile(BogieLangParser.VarDefinitionContext varDefinitionContext)
         {
             VarDefinition result = new VarDefinition();
@@ -103,6 +123,11 @@ namespace BogieLang.Runtime
         public string Identifier = null;
         public Expression Expression = null;
 
+        public object Execute()
+        {
+            throw new NotImplementedException();
+        }
+
         public static VarDeclaration Compile(BogieLangParser.VarDeclarationContext varDeclarationContext)
         {
             VarDeclaration result = new VarDeclaration();
@@ -117,6 +142,11 @@ namespace BogieLang.Runtime
     public class FunctionReturn
     {
         public Expression Expression = null;
+
+        public object Execute()
+        {
+            throw new NotImplementedException();
+        }
 
         public static FunctionReturn Compile(BogieLangParser.FunctionReturnContext functionReturnContext)
         {
@@ -136,6 +166,11 @@ namespace BogieLang.Runtime
         public IfControl IfControl = null;
         public WhileControl WhileControl;
 
+        public object Execute()
+        {
+            throw new NotImplementedException();
+        }
+
         public static Body Compile(BogieLangParser.BodyContext bodyContext)
         {
             Body result = new Body();
@@ -154,6 +189,11 @@ namespace BogieLang.Runtime
     {
         public Expression Expression;
         public List<Body> Body = new List<Body>();
+
+        public object Execute()
+        {
+            throw new NotImplementedException();
+        }
 
         public static IfControl Compile(BogieLangParser.IfControlContext ifControlContext)
         {
@@ -175,6 +215,11 @@ namespace BogieLang.Runtime
     {
         public Expression Expression;
         public List<Body> Body = new List<Body>();
+
+        public object Execute()
+        {
+            throw new NotImplementedException();
+        }
 
         public static WhileControl Compile(BogieLangParser.WhileControlContext whileControlContext)
         {
@@ -198,6 +243,11 @@ namespace BogieLang.Runtime
         public string Identifier = null;
         public List<Tuple<BogieLangType, string>> Parameters = new List<Tuple<BogieLangType, string>>();
         public List<Body> Body = new List<Body>();
+
+        public object Execute()
+        {
+            throw new NotImplementedException();
+        }
 
         public static FunctionDefinition Compile(BogieLangParser.FunctionDefinitionContext functionDefinitionContext)
         {
@@ -228,6 +278,11 @@ namespace BogieLang.Runtime
     public class Program
     {
         public List<FunctionDefinition> Functions = new List<FunctionDefinition>();
+
+        public object Execute()
+        {
+            throw new NotImplementedException();
+        }
 
         public static Program Compile(BogieLangParser.ProgramContext programContext)
         {
