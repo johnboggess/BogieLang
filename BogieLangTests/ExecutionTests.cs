@@ -229,6 +229,7 @@ namespace BogieLangTests
         public void VarDefinitionTests()
         {
             VariableEnvironment variables = new VariableEnvironment();
+            variables.Add("var", new BogieLangTypeInstance() { BogieLangType = BogieLangType.INTEGER });
 
             string txt = "var=123";
             AntlrInputStream inputStream = new AntlrInputStream(txt);
