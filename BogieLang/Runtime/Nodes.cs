@@ -175,7 +175,7 @@ namespace BogieLang.Runtime
             else if (VarDefinition != null) { VarDefinition.Execute(runtimeEnvironment, variableEnvironment); }
             else if (FunctionCall != null) { FunctionCall.Execute(); }
             else if (FunctionReturn != null) { FunctionReturn.Execute(runtimeEnvironment, variableEnvironment); }
-            else if (IfControl != null) { IfControl.Execute(); }
+            else if (IfControl != null) { IfControl.Execute(runtimeEnvironment, variableEnvironment); }
             else if (WhileControl != null) { WhileControl.Execute(); }
             else { throw new NotImplementedException(); }
         }
@@ -199,9 +199,16 @@ namespace BogieLang.Runtime
         public Expression Expression;
         public List<Body> Body = new List<Body>();
 
-        public object Execute()
+        public void Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
-            throw new NotImplementedException();
+            object obj = Expression.Execute(runtimeEnvironment, variableEnvironment);
+            if(obj is bool && (bool)obj == true)
+            {
+                foreach(Body body in Body)
+                {
+                    body.Execute(runtimeEnvironment, variableEnvironment);
+                }
+            }
         }
 
         public static IfControl Compile(BogieLangParser.IfControlContext ifControlContext)

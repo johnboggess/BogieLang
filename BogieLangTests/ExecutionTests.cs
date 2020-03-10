@@ -438,10 +438,8 @@ namespace BogieLangTests
             visitor.Visit(bodyContext);
             body = Body.Compile(bodyContext);
             body.Execute(environment, variables);
-
-
-            //todo: test if after execution of ifs are possible
-            /*txt = "if(1){int b}";
+            
+            txt = "if(1){int b}";
             inputStream = new AntlrInputStream(txt);
             lexer = new BogieLangLexer(inputStream);
             commonTokenStream = new CommonTokenStream(lexer);
@@ -450,8 +448,26 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(bodyContext);
             body = Body.Compile(bodyContext);
-            body.Execute(environment, variables);*/
+            body.Execute(environment, variables);
 
+            txt = "if(true){int b}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            bodyContext = parser.body();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(bodyContext);
+            body = Body.Compile(bodyContext);
+            try
+            {
+                body.Execute(environment, variables);
+                Assert.True(false);
+            }
+            catch
+            {
+                Assert.True(true);
+            }
 
             //todo: test while after execution of whiles are possible
             /*txt = "while(1){int b}";
@@ -466,6 +482,62 @@ namespace BogieLangTests
             Assert.True(body.WhileControl.Expression.Literal.Integer == 1);
             Assert.True(body.WhileControl.Body[0].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
             Assert.True(body.WhileControl.Body[0].VarDeclaration.Identifier == "b");*/
+        }
+
+        [Test]
+        public void IfTests()
+        {
+            VariableEnvironment variables = new VariableEnvironment();
+
+            string txt = "if(true){}";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.IfControlContext ifControlContext = parser.ifControl();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(ifControlContext);
+            IfControl ifControl = IfControl.Compile(ifControlContext);
+            ifControl.Execute(environment, variables);
+
+
+
+            txt = "if(true){int b=0}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            ifControlContext = parser.ifControl();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(ifControlContext);
+            ifControl = IfControl.Compile(ifControlContext);
+            ifControl.Execute(environment, variables);
+            Assert.True(variables["b"].BogieLangType == BogieLangType.INTEGER);
+            Assert.True(variables["b"].Identifer == "b");
+            Assert.True((int)variables["b"].Value == 0);
+
+            
+            //todo: test funcCall after execution of funcDefinitions are possible
+/*            txt = @"if(true)
+{
+    int b=0
+    b = 1
+    funcCall(b)
+    if(false){return 1}
+    return 0
+}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            ifControlContext = parser.ifControl();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(ifControlContext);
+            ifControl = IfControl.Compile(ifControlContext);
+            ifControl.Execute(environment, variables);
+            Assert.True(variables["b"].BogieLangType == BogieLangType.INTEGER);
+            Assert.True(variables["b"].Identifer == "b");
+            Assert.True((int)variables["b"].Value == 1);*/
         }
     }
 }
