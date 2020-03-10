@@ -102,9 +102,10 @@ namespace BogieLang.Runtime
         public string Identifier = null;
         public Expression Expression = null;
 
-        public object Execute()
+        public void Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
-            throw new NotImplementedException();
+            object value = Expression.Execute(runtimeEnvironment, variableEnvironment);
+            runtimeEnvironment.DefineVariable(Identifier, value, variableEnvironment);
         }
 
         public static VarDefinition Compile(BogieLangParser.VarDefinitionContext varDefinitionContext)

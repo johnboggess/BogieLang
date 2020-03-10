@@ -24,5 +24,14 @@ namespace BogieLang.Runtime
             else if (str.ToLower() == "void") { return BogieLangType.VOID; }
             else { throw new Exception("Unknown type: " + str); }
         }
+
+        public static BogieLangType ObjectToType(object obj)
+        {
+            if (obj is double) { return BogieLangType.REAL; }
+            else if (obj is int) { return BogieLangType.INTEGER; }
+            else if (obj is bool) { return BogieLangType.BOOL; }
+            else if (obj is string) { return BogieLangType.STRING; }
+            else { throw new Exception("Unknown type: " + obj); }
+        }
     }
 }

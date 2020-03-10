@@ -8,7 +8,6 @@ namespace BogieLang.Runtime
 
     public class RuntimeEnvironment
     {
-        public VariableEnvironment GlobalVariables = new VariableEnvironment();
         public Dictionary<string, FunctionDefinition> FunctionDefinitions = new Dictionary<string, FunctionDefinition>();
 
         public object GetVariableValue(string identifier, VariableEnvironment variableEnvironment)
@@ -17,11 +16,23 @@ namespace BogieLang.Runtime
             {
                 return variableEnvironment[identifier].Value;
             }
-            else if(GlobalVariables.ContainsKey(identifier))
-            {
-                return GlobalVariables[identifier].Value;
-            }
             throw new Exception("Unknown identifer: " + identifier);
+        }
+
+        public void DefineVariable(string identifier, object value, VariableEnvironment variableEnvironment)
+        {
+            BogieLangType bogieLangType = BogieLangTypeHelpr.ObjectToType(value);
+            BogieLangTypeInstance instance = new BogieLangTypeInstance();
+            instance.BogieLangType = bogieLangType;
+            instance.Identifer = identifier;
+            instance.Value = value;
+
+            if (!variableEnvironment.ContainsKey(identifier))
+            {
+                variableEnvironment.Add(identifier, instance);
+                return;
+            }
+            throw new Exception("Redefinition of variable: " + identifier);
         }
     }
 }
