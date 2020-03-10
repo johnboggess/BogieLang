@@ -39,13 +39,20 @@ namespace BogieLang.Runtime
             throw new Exception("Undeclarated variable: " + identifier);
         }
 
-        public void DeclareVariable(string identifier, object value, VariableEnvironment variableEnvironment)
+        public void DeclareVariable(string identifier, BogieLangType bogieLangType, object value, VariableEnvironment variableEnvironment)
         {
-            BogieLangType bogieLangType = BogieLangTypeHelpr.ObjectToType(value);
             BogieLangTypeInstance instance = new BogieLangTypeInstance();
             instance.BogieLangType = bogieLangType;
             instance.Identifer = identifier;
             instance.Value = value;
+
+            if(value != null)
+            {
+                if(bogieLangType != BogieLangTypeHelpr.ObjectToType(value))
+                {
+                    throw new Exception(identifier + " is of type " + variableEnvironment[identifier].BogieLangType + ", got a " + bogieLangType);
+                }
+            }
 
             if (!variableEnvironment.ContainsKey(identifier))
             {
