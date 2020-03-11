@@ -45,7 +45,7 @@ namespace BogieLang.Runtime
         public FunctionCall FunctionCall = null;
         public Expression SubExpression = null;
 
-        public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
             if (Identifier != null) { return variableEnvironment.GetVariableValue(Identifier); }
             else if (Literal != null) { return Literal.Execute(); }
@@ -100,7 +100,7 @@ namespace BogieLang.Runtime
         public string Identifier = null;
         public Expression Expression = null;
 
-        public void Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public void Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
             object value = Expression.Execute(runtimeEnvironment, variableEnvironment);
             variableEnvironment.DefineVariable(Identifier, value);
@@ -122,7 +122,7 @@ namespace BogieLang.Runtime
         public string Identifier = null;
         public Expression Expression = null;
 
-        public void Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public void Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
             object value = null;
             if(Expression != null) { value = Expression.Execute(runtimeEnvironment, variableEnvironment); }
@@ -148,7 +148,7 @@ namespace BogieLang.Runtime
     {
         public Expression Expression = null;
 
-        public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
             return Expression.Execute(runtimeEnvironment, variableEnvironment);
         }
@@ -171,7 +171,7 @@ namespace BogieLang.Runtime
         public IfControl IfControl = null;
         public WhileControl WhileControl;
 
-        public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
             if (VarDeclaration != null) { VarDeclaration.Execute(runtimeEnvironment, variableEnvironment); return null; }
             else if (VarDefinition != null) { VarDefinition.Execute(runtimeEnvironment, variableEnvironment); return null; }
@@ -201,7 +201,7 @@ namespace BogieLang.Runtime
         public Expression Expression;
         public List<Body> Body = new List<Body>();
 
-        public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
             object obj = Expression.Execute(runtimeEnvironment, variableEnvironment);
             VariableEnvironment localVariables = new VariableEnvironment();
@@ -239,7 +239,7 @@ namespace BogieLang.Runtime
         public Expression Expression;
         public List<Body> Body = new List<Body>();
 
-        public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
             object obj = Expression.Execute(runtimeEnvironment, variableEnvironment);
 
@@ -281,7 +281,7 @@ namespace BogieLang.Runtime
         public List<Tuple<BogieLangType, string>> Parameters = new List<Tuple<BogieLangType, string>>();
         public List<Body> Body = new List<Body>();
 
-        public object Execute(RuntimeEnvironment environment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment environment, VariableEnvironment variableEnvironment)
         {
             foreach(Tuple<BogieLangType, string> param in Parameters)
             {
@@ -330,7 +330,7 @@ namespace BogieLang.Runtime
 
     public class Program
     {
-        public List<FunctionDefinition> Functions = new List<FunctionDefinition>();
+        public FunctionEnvironment FunctionEnvironment = new FunctionEnvironment();
 
         public object Execute(VariableEnvironment variableEnvironment)
         {
@@ -342,7 +342,8 @@ namespace BogieLang.Runtime
             Program result = new Program();
             foreach(BogieLangParser.FunctionDefinitionContext functionDefinitionContext in programContext.functionDefinition())
             {
-                result.Functions.Add(FunctionDefinition.Compile(functionDefinitionContext));
+                FunctionDefinition functionDefinition = FunctionDefinition.Compile(functionDefinitionContext);
+                result.FunctionEnvironment.DefineFunction(functionDefinition.Identifier, functionDefinition);
             }
 
             return result;

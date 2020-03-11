@@ -24,7 +24,7 @@ namespace BogieLang.Runtime
             {
                 return ParentEnvironment.GetVariableValue(identifier);
             }
-            throw new Exception("Undeclaration identifer: " + identifier);
+            throw new Exception("Undeclared identifer: " + identifier);
         }
 
         public void Clear()

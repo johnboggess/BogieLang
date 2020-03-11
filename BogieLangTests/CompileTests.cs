@@ -648,9 +648,9 @@ namespace BogieLangTests
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(programContext);
             Program program = Program.Compile(programContext);
-            Assert.True(program.Functions[0].Identifier == "funcName");
-            Assert.True(program.Functions[0].ReturnBogieLangType == BogieLangType.VOID);
-            Assert.True(program.Functions[0].Parameters.Count == 0);
+            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName"));
+            Assert.True(program.FunctionEnvironment["funcName"].ReturnBogieLangType == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["funcName"].Parameters.Count == 0);
 
 
             txt = "void funcName(int abc,string str,void lol){}";
@@ -662,20 +662,20 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(programContext);
             program = Program.Compile(programContext);
-            Assert.True(program.Functions[0].Identifier == "funcName");
-            Assert.True(program.Functions[0].ReturnBogieLangType == BogieLangType.VOID);
-            Assert.True(program.Functions[0].Parameters[0].Item1 == BogieLangType.INTEGER);
-            Assert.True(program.Functions[0].Parameters[0].Item2 == "abc");
-            Assert.True(program.Functions[0].Parameters[1].Item1 == BogieLangType.STRING);
-            Assert.True(program.Functions[0].Parameters[1].Item2 == "str");
-            Assert.True(program.Functions[0].Parameters[2].Item1 == BogieLangType.VOID);
-            Assert.True(program.Functions[0].Parameters[2].Item2 == "lol");
-            Assert.True(program.Functions[0].Body.Count == 0);
+            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName"));
+            Assert.True(program.FunctionEnvironment["funcName"].ReturnBogieLangType == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["funcName"].Parameters[0].Item1 == BogieLangType.INTEGER);
+            Assert.True(program.FunctionEnvironment["funcName"].Parameters[0].Item2 == "abc");
+            Assert.True(program.FunctionEnvironment["funcName"].Parameters[1].Item1 == BogieLangType.STRING);
+            Assert.True(program.FunctionEnvironment["funcName"].Parameters[1].Item2 == "str");
+            Assert.True(program.FunctionEnvironment["funcName"].Parameters[2].Item1 == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["funcName"].Parameters[2].Item2 == "lol");
+            Assert.True(program.FunctionEnvironment["funcName"].Body.Count == 0);
 
 
             txt = "void funcName(){}" +
-                "void funcName(int abc,string str,void lol){}" +
-                "void funcName(int abc,string str,void lol){int intvar" +
+                "void funcName1(int abc,string str,void lol){}" +
+                "void funcName2(int abc,string str,void lol){int intvar" +
                 "\nint intvar=123" +
                 "\nintvar=0.1" +
                 "\nfuncCall(lol)" +
@@ -689,39 +689,39 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(programContext);
             program = Program.Compile(programContext);
-            Assert.True(program.Functions[0].Identifier == "funcName");
-            Assert.True(program.Functions[0].ReturnBogieLangType == BogieLangType.VOID);
-            Assert.True(program.Functions[0].Parameters.Count == 0);
+            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName"));
+            Assert.True(program.FunctionEnvironment["funcName"].ReturnBogieLangType == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["funcName"].Parameters.Count == 0);
 
-            Assert.True(program.Functions[1].Identifier == "funcName");
-            Assert.True(program.Functions[1].ReturnBogieLangType == BogieLangType.VOID);
-            Assert.True(program.Functions[1].Parameters[0].Item1 == BogieLangType.INTEGER);
-            Assert.True(program.Functions[1].Parameters[0].Item2 == "abc");
-            Assert.True(program.Functions[1].Parameters[1].Item1 == BogieLangType.STRING);
-            Assert.True(program.Functions[1].Parameters[1].Item2 == "str");
-            Assert.True(program.Functions[1].Parameters[2].Item1 == BogieLangType.VOID);
-            Assert.True(program.Functions[1].Parameters[2].Item2 == "lol");
-            Assert.True(program.Functions[1].Body.Count == 0);
+            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName"));
+            Assert.True(program.FunctionEnvironment["funcName1"].ReturnBogieLangType == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["funcName1"].Parameters[0].Item1 == BogieLangType.INTEGER);
+            Assert.True(program.FunctionEnvironment["funcName1"].Parameters[0].Item2 == "abc");
+            Assert.True(program.FunctionEnvironment["funcName1"].Parameters[1].Item1 == BogieLangType.STRING);
+            Assert.True(program.FunctionEnvironment["funcName1"].Parameters[1].Item2 == "str");
+            Assert.True(program.FunctionEnvironment["funcName1"].Parameters[2].Item1 == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["funcName1"].Parameters[2].Item2 == "lol");
+            Assert.True(program.FunctionEnvironment["funcName1"].Body.Count == 0);
 
-            Assert.True(program.Functions[2].Identifier == "funcName");
-            Assert.True(program.Functions[2].ReturnBogieLangType == BogieLangType.VOID);
-            Assert.True(program.Functions[2].Parameters[0].Item1 == BogieLangType.INTEGER);
-            Assert.True(program.Functions[2].Parameters[0].Item2 == "abc");
-            Assert.True(program.Functions[2].Parameters[1].Item1 == BogieLangType.STRING);
-            Assert.True(program.Functions[2].Parameters[1].Item2 == "str");
-            Assert.True(program.Functions[2].Parameters[2].Item1 == BogieLangType.VOID);
-            Assert.True(program.Functions[2].Parameters[2].Item2 == "lol");
+            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName"));
+            Assert.True(program.FunctionEnvironment["funcName2"].ReturnBogieLangType == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["funcName2"].Parameters[0].Item1 == BogieLangType.INTEGER);
+            Assert.True(program.FunctionEnvironment["funcName2"].Parameters[0].Item2 == "abc");
+            Assert.True(program.FunctionEnvironment["funcName2"].Parameters[1].Item1 == BogieLangType.STRING);
+            Assert.True(program.FunctionEnvironment["funcName2"].Parameters[1].Item2 == "str");
+            Assert.True(program.FunctionEnvironment["funcName2"].Parameters[2].Item1 == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["funcName2"].Parameters[2].Item2 == "lol");
 
-            Assert.True(program.Functions[2].Body[0].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
-            Assert.True(program.Functions[2].Body[0].VarDeclaration.Identifier == "intvar");
-            Assert.True(program.Functions[2].Body[1].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
-            Assert.True(program.Functions[2].Body[1].VarDeclaration.Identifier == "intvar");
-            Assert.True(program.Functions[2].Body[1].VarDeclaration.Expression.Literal.Integer == 123);
-            Assert.True(program.Functions[2].Body[2].VarDefinition.Identifier == "intvar");
-            Assert.True(program.Functions[2].Body[2].VarDefinition.Expression.Literal.Real == 0.1);
-            Assert.True(program.Functions[2].Body[3].FunctionCall.Identifier == "funcCall");
-            Assert.True(program.Functions[2].Body[3].FunctionCall.Arguments[0].Identifier == "lol");
-            Assert.True(program.Functions[2].Body[4].FunctionReturn.Expression.FunctionCall.Identifier == "funcCall");
+            Assert.True(program.FunctionEnvironment["funcName2"].Body[0].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(program.FunctionEnvironment["funcName2"].Body[0].VarDeclaration.Identifier == "intvar");
+            Assert.True(program.FunctionEnvironment["funcName2"].Body[1].VarDeclaration.BogieLangType == BogieLangType.INTEGER);
+            Assert.True(program.FunctionEnvironment["funcName2"].Body[1].VarDeclaration.Identifier == "intvar");
+            Assert.True(program.FunctionEnvironment["funcName2"].Body[1].VarDeclaration.Expression.Literal.Integer == 123);
+            Assert.True(program.FunctionEnvironment["funcName2"].Body[2].VarDefinition.Identifier == "intvar");
+            Assert.True(program.FunctionEnvironment["funcName2"].Body[2].VarDefinition.Expression.Literal.Real == 0.1);
+            Assert.True(program.FunctionEnvironment["funcName2"].Body[3].FunctionCall.Identifier == "funcCall");
+            Assert.True(program.FunctionEnvironment["funcName2"].Body[3].FunctionCall.Arguments[0].Identifier == "lol");
+            Assert.True(program.FunctionEnvironment["funcName2"].Body[4].FunctionReturn.Expression.FunctionCall.Identifier == "funcCall");
         }
     }
 }

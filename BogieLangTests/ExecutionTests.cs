@@ -11,7 +11,7 @@ namespace BogieLangTests
 {
     class ExecutionTests
     {
-        RuntimeEnvironment environment = new RuntimeEnvironment();
+        FunctionEnvironment environment = new FunctionEnvironment();
         
         [Test]
         public void LiteralTests()
@@ -602,6 +602,91 @@ namespace BogieLangTests
             visitor.Visit(whileControlContext);
             whileControl = WhileControl.Compile(whileControlContext);
             Assert.True((int)whileControl.Execute(environment, variables) == 0);*/
+        }
+        
+        [Test]
+        public void FunctionDefinitionTests()
+        {
+            VariableEnvironment variableEnvironment = new VariableEnvironment();
+            FunctionEnvironment functionEnvironment = new FunctionEnvironment();
+
+            string txt = "void funcName(){}";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.FunctionDefinitionContext functionDefinitionContext = parser.functionDefinition();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(functionDefinitionContext);
+            FunctionDefinition functionDefinition = FunctionDefinition.Compile(functionDefinitionContext);
+            functionEnvironment.FunctionDefinitions.Add("funcName", functionDefinition);
+            functionDefinition.Execute(functionEnvironment, variableEnvironment);
+
+            functionEnvironment.Clear();
+            variableEnvironment.DeclaredVariables = new Dictionary<string, BogieLangTypeInstance>()
+            {
+                { "abc", new BogieLangTypeInstance() { BogieLangType = BogieLangType.INTEGER, Identifer="abc", Value = 1 } },
+                { "str", new BogieLangTypeInstance() { BogieLangType = BogieLangType.STRING, Identifer="str", Value = "string" } },
+                { "lol", new BogieLangTypeInstance() { BogieLangType = BogieLangType.VOID, Identifer="lol", Value = null } }
+            };
+            txt = "void funcName(int abc,string str,void lol){}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            functionDefinitionContext = parser.functionDefinition();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(functionDefinitionContext);
+            functionDefinition = FunctionDefinition.Compile(functionDefinitionContext);
+            functionEnvironment.FunctionDefinitions.Add("funcName", functionDefinition);
+            functionDefinition.Execute(functionEnvironment, variableEnvironment);
+
+            //todo: enable once funcCalls can be executed
+            /*txt = "void funcName(int abc,string str,bool b){int intvar" +
+                "\n intvar=123" +
+                "\nintvar=1" +
+                "\nreturn funcCall(b)" +
+                "\n}";
+
+            //todo: can object returned not match the return type?
+            string txt2 = "\nint funCall(bool b)" +
+                "\n{" +
+                "\nif(b)" +
+                "\n{" +
+                "\n return 100" +
+                "\n}" +
+                "\nreturn 0" +
+                "}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            functionDefinitionContext = parser.functionDefinition();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(functionDefinitionContext);
+            FunctionDefinition functionDefinition1 = FunctionDefinition.Compile(functionDefinitionContext);
+
+            inputStream = new AntlrInputStream(txt2);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            functionDefinitionContext = parser.functionDefinition();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(functionDefinitionContext);
+            FunctionDefinition functionDefinition2 = FunctionDefinition.Compile(functionDefinitionContext);
+
+            variableEnvironment.Clear();
+            functionEnvironment.Clear();
+
+            variableEnvironment.DeclaredVariables = new Dictionary<string, BogieLangTypeInstance>()
+            {
+                { "abc", new BogieLangTypeInstance() { BogieLangType = BogieLangType.INTEGER, Identifer="abc", Value = 1 } },
+                { "str", new BogieLangTypeInstance() { BogieLangType = BogieLangType.STRING, Identifer="str", Value = "string" } },
+                { "b", new BogieLangTypeInstance() { BogieLangType = BogieLangType.BOOL, Identifer="b", Value = true } }
+            };
+            functionEnvironment.DefineFunction("funcName", functionDefinition1);
+            functionEnvironment.DefineFunction("funCall", functionDefinition2);
+            functionDefinition1.Execute(functionEnvironment, variableEnvironment);*/
         }
     }
 }
