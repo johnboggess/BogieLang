@@ -639,7 +639,7 @@ namespace BogieLangTests
         [Test]
         public void ProgramTests()
         {
-            string txt = "void funcName(){}";
+            string txt = "void Main(){}";
             AntlrInputStream inputStream = new AntlrInputStream(txt);
             BogieLangLexer lexer = new BogieLangLexer(inputStream);
             CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
@@ -648,12 +648,12 @@ namespace BogieLangTests
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(programContext);
             Program program = Program.Compile(programContext);
-            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName"));
-            Assert.True(program.FunctionEnvironment["funcName"].ReturnBogieLangType == BogieLangType.VOID);
-            Assert.True(program.FunctionEnvironment["funcName"].Parameters.Count == 0);
+            Assert.True(program.FunctionEnvironment.IsFunctionDefined("Main"));
+            Assert.True(program.FunctionEnvironment["Main"].ReturnBogieLangType == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["Main"].Parameters.Count == 0);
 
 
-            txt = "void funcName(int abc,string str,void lol){}";
+            txt = "void Main(int abc,string str,void lol){}";
             inputStream = new AntlrInputStream(txt);
             lexer = new BogieLangLexer(inputStream);
             commonTokenStream = new CommonTokenStream(lexer);
@@ -662,18 +662,18 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(programContext);
             program = Program.Compile(programContext);
-            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName"));
-            Assert.True(program.FunctionEnvironment["funcName"].ReturnBogieLangType == BogieLangType.VOID);
-            Assert.True(program.FunctionEnvironment["funcName"].Parameters[0].Item1 == BogieLangType.INTEGER);
-            Assert.True(program.FunctionEnvironment["funcName"].Parameters[0].Item2 == "abc");
-            Assert.True(program.FunctionEnvironment["funcName"].Parameters[1].Item1 == BogieLangType.STRING);
-            Assert.True(program.FunctionEnvironment["funcName"].Parameters[1].Item2 == "str");
-            Assert.True(program.FunctionEnvironment["funcName"].Parameters[2].Item1 == BogieLangType.VOID);
-            Assert.True(program.FunctionEnvironment["funcName"].Parameters[2].Item2 == "lol");
-            Assert.True(program.FunctionEnvironment["funcName"].Body.Count == 0);
+            Assert.True(program.FunctionEnvironment.IsFunctionDefined("Main"));
+            Assert.True(program.FunctionEnvironment["Main"].ReturnBogieLangType == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["Main"].Parameters[0].Item1 == BogieLangType.INTEGER);
+            Assert.True(program.FunctionEnvironment["Main"].Parameters[0].Item2 == "abc");
+            Assert.True(program.FunctionEnvironment["Main"].Parameters[1].Item1 == BogieLangType.STRING);
+            Assert.True(program.FunctionEnvironment["Main"].Parameters[1].Item2 == "str");
+            Assert.True(program.FunctionEnvironment["Main"].Parameters[2].Item1 == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["Main"].Parameters[2].Item2 == "lol");
+            Assert.True(program.FunctionEnvironment["Main"].Body.Count == 0);
 
 
-            txt = "void funcName(){}" +
+            txt = "void Main(){}" +
                 "void funcName1(int abc,string str,void lol){}" +
                 "void funcName2(int abc,string str,void lol){int intvar" +
                 "\nint intvar=123" +
@@ -689,11 +689,11 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(programContext);
             program = Program.Compile(programContext);
-            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName"));
-            Assert.True(program.FunctionEnvironment["funcName"].ReturnBogieLangType == BogieLangType.VOID);
-            Assert.True(program.FunctionEnvironment["funcName"].Parameters.Count == 0);
+            Assert.True(program.FunctionEnvironment.IsFunctionDefined("Main"));
+            Assert.True(program.FunctionEnvironment["Main"].ReturnBogieLangType == BogieLangType.VOID);
+            Assert.True(program.FunctionEnvironment["Main"].Parameters.Count == 0);
 
-            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName"));
+            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName1"));
             Assert.True(program.FunctionEnvironment["funcName1"].ReturnBogieLangType == BogieLangType.VOID);
             Assert.True(program.FunctionEnvironment["funcName1"].Parameters[0].Item1 == BogieLangType.INTEGER);
             Assert.True(program.FunctionEnvironment["funcName1"].Parameters[0].Item2 == "abc");
@@ -703,7 +703,7 @@ namespace BogieLangTests
             Assert.True(program.FunctionEnvironment["funcName1"].Parameters[2].Item2 == "lol");
             Assert.True(program.FunctionEnvironment["funcName1"].Body.Count == 0);
 
-            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName"));
+            Assert.True(program.FunctionEnvironment.IsFunctionDefined("funcName2"));
             Assert.True(program.FunctionEnvironment["funcName2"].ReturnBogieLangType == BogieLangType.VOID);
             Assert.True(program.FunctionEnvironment["funcName2"].Parameters[0].Item1 == BogieLangType.INTEGER);
             Assert.True(program.FunctionEnvironment["funcName2"].Parameters[0].Item2 == "abc");

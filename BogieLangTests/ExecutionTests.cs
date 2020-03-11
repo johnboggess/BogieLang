@@ -515,5 +515,31 @@ namespace BogieLangTests
             functionEnvironment.DefineFunction("funcCall", functionDefinition2);
             Assert.True((int)functionDefinition1.Execute(functionEnvironment, variableEnvironment) == 100);
         }
+
+        [Test]
+        public void ProgramTests()
+        {
+            string txt = @"
+bool Main()
+{
+    return func(true)
+}
+
+bool func(bool b)
+{
+    if(b){return false}
+    return true
+}";
+            AntlrInputStream inputStream = new AntlrInputStream(txt);
+            BogieLangLexer lexer = new BogieLangLexer(inputStream);
+            CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
+            BogieLangParser parser = new BogieLangParser(commonTokenStream);
+            BogieLangParser.ProgramContext programContext = parser.program();
+            BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(programContext);
+            Program program = Program.Compile(programContext);
+
+            Assert.True((bool)program.Execute() == false);
+        }
     }
 }

@@ -359,10 +359,18 @@ namespace BogieLang.Runtime
     public class Program
     {
         public FunctionEnvironment FunctionEnvironment = new FunctionEnvironment();
+        public VariableEnvironment VariableEnvironment = new VariableEnvironment();
 
-        public object Execute(VariableEnvironment variableEnvironment)
+        public object Execute()
         {
-            throw new NotImplementedException();
+            if(FunctionEnvironment.IsFunctionDefined("Main"))
+            {
+                return FunctionEnvironment.GetDefinedFunction("Main").Execute(FunctionEnvironment, VariableEnvironment);
+            }
+            else
+            {
+                throw new Exception("Cannot find Main.");
+            }
         }
 
         public static Program Compile(BogieLangParser.ProgramContext programContext)
