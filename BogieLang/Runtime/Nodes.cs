@@ -4,8 +4,6 @@ using System.Text;
 
 namespace BogieLang.Runtime
 {
-    using VariableEnvironment = Dictionary<string, BogieLangTypeInstance>;
-
     public class Literal
     {
         public double? Real = null;
@@ -49,7 +47,7 @@ namespace BogieLang.Runtime
 
         public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
-            if (Identifier != null) { return runtimeEnvironment.GetVariableValue(Identifier, variableEnvironment); }
+            if (Identifier != null) { return variableEnvironment.GetVariableValue(Identifier); }
             else if (Literal != null) { return Literal.Execute(); }
             else if (FunctionCall != null) { return FunctionCall.Execute(); }
             else { throw new Exception("Unknown expression"); }
@@ -105,7 +103,7 @@ namespace BogieLang.Runtime
         public void Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
             object value = Expression.Execute(runtimeEnvironment, variableEnvironment);
-            runtimeEnvironment.DefineVariable(Identifier, value, variableEnvironment);
+            variableEnvironment.DefineVariable(Identifier, value);
         }
 
         public static VarDefinition Compile(BogieLangParser.VarDefinitionContext varDefinitionContext)
@@ -128,7 +126,11 @@ namespace BogieLang.Runtime
         {
             object value = null;
             if(Expression != null) { value = Expression.Execute(runtimeEnvironment, variableEnvironment); }
-            runtimeEnvironment.DeclareVariable(Identifier, (BogieLangType)BogieLangType, value, variableEnvironment);
+            variableEnvironment.DeclareVariable(Identifier, (BogieLangType)BogieLangType);
+            if (value != null)
+            {
+                variableEnvironment.DefineVariable(Identifier, value);
+            }
         }
 
         public static VarDeclaration Compile(BogieLangParser.VarDeclarationContext varDeclarationContext)
@@ -169,14 +171,14 @@ namespace BogieLang.Runtime
         public IfControl IfControl = null;
         public WhileControl WhileControl;
 
-        public void Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
-            if (VarDeclaration != null) { VarDeclaration.Execute(runtimeEnvironment, variableEnvironment); }
-            else if (VarDefinition != null) { VarDefinition.Execute(runtimeEnvironment, variableEnvironment); }
-            else if (FunctionCall != null) { FunctionCall.Execute(); }
-            else if (FunctionReturn != null) { FunctionReturn.Execute(runtimeEnvironment, variableEnvironment); }
-            else if (IfControl != null) { IfControl.Execute(runtimeEnvironment, variableEnvironment); }
-            else if (WhileControl != null) { WhileControl.Execute(); }
+            if (VarDeclaration != null) { VarDeclaration.Execute(runtimeEnvironment, variableEnvironment); return null; }
+            else if (VarDefinition != null) { VarDefinition.Execute(runtimeEnvironment, variableEnvironment); return null; }
+            else if (FunctionCall != null) { FunctionCall.Execute(); return null; }
+            else if (FunctionReturn != null) { return FunctionReturn.Execute(runtimeEnvironment, variableEnvironment); }
+            else if (IfControl != null) { IfControl.Execute(runtimeEnvironment, variableEnvironment); return null; }
+            else if (WhileControl != null) { WhileControl.Execute(runtimeEnvironment, variableEnvironment); return null; }
             else { throw new NotImplementedException(); }
         }
 
@@ -199,16 +201,21 @@ namespace BogieLang.Runtime
         public Expression Expression;
         public List<Body> Body = new List<Body>();
 
-        public void Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
             object obj = Expression.Execute(runtimeEnvironment, variableEnvironment);
+            VariableEnvironment localVariables = new VariableEnvironment();
+            localVariables.ParentEnvironment = variableEnvironment;
+
             if(obj is bool && (bool)obj == true)
             {
                 foreach(Body body in Body)
                 {
-                    body.Execute(runtimeEnvironment, variableEnvironment);
+                    object val = body.Execute(runtimeEnvironment, localVariables);
+                    if (val != null) { return val; };
                 }
             }
+            return null;
         }
 
         public static IfControl Compile(BogieLangParser.IfControlContext ifControlContext)
@@ -219,7 +226,7 @@ namespace BogieLang.Runtime
             {
                 foreach (BogieLangParser.BodyContext context in ifControlContext.body())
                 {
-                    result.Body.Add(Runtime.Body.Compile(context));
+                    result.Body.Add(Runtime.Body.Compile(context));//todo: handle funciton returns;
                 }
             }
 
@@ -232,9 +239,23 @@ namespace BogieLang.Runtime
         public Expression Expression;
         public List<Body> Body = new List<Body>();
 
-        public object Execute()
+        public object Execute(RuntimeEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
         {
-            throw new NotImplementedException();
+            object obj = Expression.Execute(runtimeEnvironment, variableEnvironment);
+
+            VariableEnvironment localVariables = new VariableEnvironment();
+            localVariables.ParentEnvironment = variableEnvironment;
+            while (obj is bool && (bool)obj == true)
+            {
+                foreach (Body body in Body)
+                {
+                    object val = body.Execute(runtimeEnvironment, localVariables);
+                    if (val != null) { return val; };
+                }
+                obj = Expression.Execute(runtimeEnvironment, variableEnvironment);
+                localVariables.Clear();
+            }
+            return null;
         }
 
         public static WhileControl Compile(BogieLangParser.WhileControlContext whileControlContext)
