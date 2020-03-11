@@ -45,11 +45,11 @@ namespace BogieLang.Runtime
         public FunctionCall FunctionCall = null;
         public Expression SubExpression = null;
 
-        public object Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
             if (Identifier != null) { return variableEnvironment.GetVariableValue(Identifier); }
             else if (Literal != null) { return Literal.Execute(); }
-            else if (FunctionCall != null) { return FunctionCall.Execute(); }
+            else if (FunctionCall != null) { return FunctionCall.Execute(functionEnvironment, variableEnvironment); }
             else { throw new Exception("Unknown expression"); }
         }
 
@@ -72,9 +72,29 @@ namespace BogieLang.Runtime
         public string Identifier = null;
         public List<Expression> Arguments = new List<Expression>();
 
-        public object Execute()
+        public object Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
-            throw new NotImplementedException();
+            if(!functionEnvironment.IsFunctionDefined(Identifier))
+            {
+                throw new Exception("Calling undefined function: " + Identifier);
+            }
+            VariableEnvironment localVariables = new VariableEnvironment();
+            localVariables.ParentEnvironment = variableEnvironment;//todo: switch
+
+            FunctionDefinition functionDefinition = functionEnvironment.GetDefinedFunction(Identifier);
+
+            for(int i = 0; i < Arguments.Count; i++)
+            {
+                object obj = Arguments[i].Execute(functionEnvironment, variableEnvironment);
+                BogieLangType bogieLangType = BogieLangTypeHelpr.ObjectToType(obj);
+                if (functionDefinition.Parameters[i].Item1 == bogieLangType)
+                {
+                    localVariables.DeclareVariable(functionDefinition.Parameters[i].Item2, functionDefinition.Parameters[i].Item1);
+                    localVariables.DefineVariable(functionDefinition.Parameters[i].Item2, obj);
+                }
+            }
+
+            return functionDefinition.Execute(functionEnvironment, localVariables);
         }
 
         public static FunctionCall Compile(BogieLangParser.FunctionCallContext functionCallContext)
@@ -100,9 +120,9 @@ namespace BogieLang.Runtime
         public string Identifier = null;
         public Expression Expression = null;
 
-        public void Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public void Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
-            object value = Expression.Execute(runtimeEnvironment, variableEnvironment);
+            object value = Expression.Execute(functionEnvironment, variableEnvironment);
             variableEnvironment.DefineVariable(Identifier, value);
         }
 
@@ -122,10 +142,10 @@ namespace BogieLang.Runtime
         public string Identifier = null;
         public Expression Expression = null;
 
-        public void Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public void Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
             object value = null;
-            if(Expression != null) { value = Expression.Execute(runtimeEnvironment, variableEnvironment); }
+            if(Expression != null) { value = Expression.Execute(functionEnvironment, variableEnvironment); }
             variableEnvironment.DeclareVariable(Identifier, (BogieLangType)BogieLangType);
             if (value != null)
             {
@@ -148,9 +168,9 @@ namespace BogieLang.Runtime
     {
         public Expression Expression = null;
 
-        public object Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
-            return Expression.Execute(runtimeEnvironment, variableEnvironment);
+            return Expression.Execute(functionEnvironment, variableEnvironment);
         }
 
         public static FunctionReturn Compile(BogieLangParser.FunctionReturnContext functionReturnContext)
@@ -171,14 +191,14 @@ namespace BogieLang.Runtime
         public IfControl IfControl = null;
         public WhileControl WhileControl;
 
-        public object Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
-            if (VarDeclaration != null) { VarDeclaration.Execute(runtimeEnvironment, variableEnvironment); return null; }
-            else if (VarDefinition != null) { VarDefinition.Execute(runtimeEnvironment, variableEnvironment); return null; }
-            else if (FunctionCall != null) { FunctionCall.Execute(); return null; }
-            else if (FunctionReturn != null) { return FunctionReturn.Execute(runtimeEnvironment, variableEnvironment); }
-            else if (IfControl != null) { IfControl.Execute(runtimeEnvironment, variableEnvironment); return null; }
-            else if (WhileControl != null) { WhileControl.Execute(runtimeEnvironment, variableEnvironment); return null; }
+            if (VarDeclaration != null) { VarDeclaration.Execute(functionEnvironment, variableEnvironment); return null; }
+            else if (VarDefinition != null) { VarDefinition.Execute(functionEnvironment, variableEnvironment); return null; }
+            else if (FunctionCall != null) { return FunctionCall.Execute(functionEnvironment, variableEnvironment); }
+            else if (FunctionReturn != null) { return FunctionReturn.Execute(functionEnvironment, variableEnvironment); }
+            else if (IfControl != null) { return IfControl.Execute(functionEnvironment, variableEnvironment); }
+            else if (WhileControl != null) { return WhileControl.Execute(functionEnvironment, variableEnvironment); }
             else { throw new NotImplementedException(); }
         }
 
@@ -201,9 +221,9 @@ namespace BogieLang.Runtime
         public Expression Expression;
         public List<Body> Body = new List<Body>();
 
-        public object Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
-            object obj = Expression.Execute(runtimeEnvironment, variableEnvironment);
+            object obj = Expression.Execute(functionEnvironment, variableEnvironment);
             VariableEnvironment localVariables = new VariableEnvironment();
             localVariables.ParentEnvironment = variableEnvironment;
 
@@ -211,7 +231,7 @@ namespace BogieLang.Runtime
             {
                 foreach(Body body in Body)
                 {
-                    object val = body.Execute(runtimeEnvironment, localVariables);
+                    object val = body.Execute(functionEnvironment, localVariables);
                     if (val != null) { return val; };
                 }
             }
@@ -239,9 +259,9 @@ namespace BogieLang.Runtime
         public Expression Expression;
         public List<Body> Body = new List<Body>();
 
-        public object Execute(FunctionEnvironment runtimeEnvironment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
-            object obj = Expression.Execute(runtimeEnvironment, variableEnvironment);
+            object obj = Expression.Execute(functionEnvironment, variableEnvironment);
 
             VariableEnvironment localVariables = new VariableEnvironment();
             localVariables.ParentEnvironment = variableEnvironment;
@@ -249,10 +269,10 @@ namespace BogieLang.Runtime
             {
                 foreach (Body body in Body)
                 {
-                    object val = body.Execute(runtimeEnvironment, localVariables);
+                    object val = body.Execute(functionEnvironment, localVariables);
                     if (val != null) { return val; };
                 }
-                obj = Expression.Execute(runtimeEnvironment, variableEnvironment);
+                obj = Expression.Execute(functionEnvironment, variableEnvironment);
                 localVariables.Clear();
             }
             return null;
@@ -281,7 +301,7 @@ namespace BogieLang.Runtime
         public List<Tuple<BogieLangType, string>> Parameters = new List<Tuple<BogieLangType, string>>();
         public List<Body> Body = new List<Body>();
 
-        public object Execute(FunctionEnvironment environment, VariableEnvironment variableEnvironment)
+        public object Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
             foreach(Tuple<BogieLangType, string> param in Parameters)
             {
@@ -293,10 +313,18 @@ namespace BogieLang.Runtime
 
             foreach(Body body in Body)
             {
-                object obj = body.Execute(environment, variableEnvironment);
+                object obj = body.Execute(functionEnvironment, variableEnvironment);
                 if(obj != null)
                 {
-                    return obj;
+                    BogieLangType returningType = BogieLangTypeHelpr.ObjectToType(obj);
+                    if (returningType == ReturnBogieLangType)
+                    {
+                        return obj;
+                    }
+                    else
+                    {
+                        throw new Exception("Function " + Identifier + " returned a " + returningType + ", but should return a " + ReturnBogieLangType);
+                    }
                 }
             }
             return null;
