@@ -281,9 +281,25 @@ namespace BogieLang.Runtime
         public List<Tuple<BogieLangType, string>> Parameters = new List<Tuple<BogieLangType, string>>();
         public List<Body> Body = new List<Body>();
 
-        public object Execute()
+        public object Execute(RuntimeEnvironment environment, VariableEnvironment variableEnvironment)
         {
-            throw new NotImplementedException();
+            foreach(Tuple<BogieLangType, string> param in Parameters)
+            {
+                if(!variableEnvironment.IsVariableDeclared(param.Item2))
+                {
+                    throw new Exception("Missing parameter: " + param.Item2);
+                }
+            }
+
+            foreach(Body body in Body)
+            {
+                object obj = body.Execute(environment, variableEnvironment);
+                if(obj != null)
+                {
+                    return obj;
+                }
+            }
+            return null;
         }
 
         public static FunctionDefinition Compile(BogieLangParser.FunctionDefinitionContext functionDefinitionContext)
@@ -316,7 +332,7 @@ namespace BogieLang.Runtime
     {
         public List<FunctionDefinition> Functions = new List<FunctionDefinition>();
 
-        public object Execute()
+        public object Execute(VariableEnvironment variableEnvironment)
         {
             throw new NotImplementedException();
         }
