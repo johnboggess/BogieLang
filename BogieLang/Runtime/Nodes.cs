@@ -44,10 +44,13 @@ namespace BogieLang.Runtime
         public string Operator = null;
         public FunctionCall FunctionCall = null;
         public Expression SubExpression = null;
+        public Expression ParentExpression = null;
 
         public object Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
-            if (SubExpression == null)
+            Expression rightExpression = _getRightmostExpression();
+            return rightExpression._execute(functionEnvironment, variableEnvironment);
+            /*if (SubExpression == null)
             {
                 if (Identifier != null) { return variableEnvironment.GetVariableValue(Identifier); }
                 else if (Literal != null) { return Literal.Execute(); }
@@ -64,18 +67,47 @@ namespace BogieLang.Runtime
 
                 object right = SubExpression.Execute(functionEnvironment, variableEnvironment);
                 return Operators.OperatorHelper.Execute(Operator, left, right);
+            }*/
+        }
+
+        private Expression _getRightmostExpression()
+        {
+            if(SubExpression != null) { return SubExpression._getRightmostExpression(); }
+            return this;
+        }
+
+        private object _execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
+        {
+            if (ParentExpression == null)
+            {
+                if (Identifier != null) { return variableEnvironment.GetVariableValue(Identifier); }
+                else if (Literal != null) { return Literal.Execute(); }
+                else if (FunctionCall != null) { return FunctionCall.Execute(functionEnvironment, variableEnvironment); }
+                else { throw new Exception("Unknown expression"); }
+            }
+            else
+            {
+                object right;
+                if (Identifier != null) { right = variableEnvironment.GetVariableValue(Identifier); }
+                else if (Literal != null) { right = Literal.Execute(); }
+                else if (FunctionCall != null) { right = FunctionCall.Execute(functionEnvironment, variableEnvironment); }
+                else { throw new Exception("Unknown expression"); }
+
+                object left = ParentExpression._execute(functionEnvironment, variableEnvironment);
+                return Operators.OperatorHelper.Execute(ParentExpression.Operator, left, right);
             }
         }
 
-        public static Expression Compile(BogieLangParser.ExpressionContext expressionContext)
+        public static Expression Compile(BogieLangParser.ExpressionContext expressionContext, Expression parentExpression)
         {
             Expression result = new Expression();
+            result.ParentExpression = parentExpression;
             if (expressionContext.IDENTIFIER() != null) { result.Identifier = expressionContext.IDENTIFIER().GetText(); }
             else if (expressionContext.literal() != null) { result.Literal = Literal.Compile(expressionContext.literal()); }
             else if (expressionContext.functionCall() != null) { result.FunctionCall = FunctionCall.Compile(expressionContext.functionCall()); }
 
             if (expressionContext.OPERATOR() != null) { result.Operator = expressionContext.OPERATOR().GetText(); }
-            if (expressionContext.expression() != null) { result.SubExpression = Expression.Compile(expressionContext.expression()); }
+            if (expressionContext.expression() != null) { result.SubExpression = Expression.Compile(expressionContext.expression(), result); }
 
             return result;
         }
@@ -120,7 +152,7 @@ namespace BogieLang.Runtime
                 List<Expression> expressions = new List<Expression>();
                 foreach (BogieLangParser.ExpressionContext expressionContext in functionCallContext.expression())
                 {
-                    expressions.Add(Expression.Compile(expressionContext));
+                    expressions.Add(Expression.Compile(expressionContext, null));
                 }
                 result.Arguments = expressions;
             }
@@ -144,7 +176,7 @@ namespace BogieLang.Runtime
         {
             VarDefinition result = new VarDefinition();
             if (varDefinitionContext.IDENTIFIER() != null) { result.Identifier = varDefinitionContext.IDENTIFIER().GetText(); }
-            if (varDefinitionContext.expression() != null) { result.Expression = Expression.Compile(varDefinitionContext.expression()); }
+            if (varDefinitionContext.expression() != null) { result.Expression = Expression.Compile(varDefinitionContext.expression(), null); }
 
             return result;
         }
@@ -172,7 +204,7 @@ namespace BogieLang.Runtime
             VarDeclaration result = new VarDeclaration();
             if (varDeclarationContext.TYPE() != null) { result.BogieLangType = Runtime.BogieLangTypeHelpr.StringToType(varDeclarationContext.TYPE().GetText()); }
             if (varDeclarationContext.IDENTIFIER() != null) { result.Identifier = varDeclarationContext.IDENTIFIER().GetText(); }
-            if (varDeclarationContext.expression() != null) { result.Expression = Expression.Compile(varDeclarationContext.expression()); }
+            if (varDeclarationContext.expression() != null) { result.Expression = Expression.Compile(varDeclarationContext.expression(), null); }
 
             return result;
         }
@@ -190,7 +222,7 @@ namespace BogieLang.Runtime
         public static FunctionReturn Compile(BogieLangParser.FunctionReturnContext functionReturnContext)
         {
             FunctionReturn result = new FunctionReturn();
-            if (functionReturnContext.expression() != null) { result.Expression = Expression.Compile(functionReturnContext.expression()); }
+            if (functionReturnContext.expression() != null) { result.Expression = Expression.Compile(functionReturnContext.expression(), null); }
 
             return result;
         }
@@ -255,7 +287,7 @@ namespace BogieLang.Runtime
         public static IfControl Compile(BogieLangParser.IfControlContext ifControlContext)
         {
             IfControl result = new IfControl();
-            if (ifControlContext.expression() != null) { result.Expression = Expression.Compile(ifControlContext.expression()); }
+            if (ifControlContext.expression() != null) { result.Expression = Expression.Compile(ifControlContext.expression(), null); }
             if (ifControlContext.body().Length != 0)
             {
                 foreach (BogieLangParser.BodyContext context in ifControlContext.body())
@@ -295,7 +327,7 @@ namespace BogieLang.Runtime
         public static WhileControl Compile(BogieLangParser.WhileControlContext whileControlContext)
         {
             WhileControl result = new WhileControl();
-            if (whileControlContext.expression() != null) { result.Expression = Expression.Compile(whileControlContext.expression()); }
+            if (whileControlContext.expression() != null) { result.Expression = Expression.Compile(whileControlContext.expression(), null); }
             if (whileControlContext.body().Length != 0)
             {
                 foreach (BogieLangParser.BodyContext context in whileControlContext.body())

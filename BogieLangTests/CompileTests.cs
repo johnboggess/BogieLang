@@ -97,12 +97,13 @@ namespace BogieLangTests
             BogieLangParser.ExpressionContext expressionContext = parser.expression();
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            Expression expression = Expression.Compile(expressionContext);
+            Expression expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Identifier == null);
             Assert.True(expression.Literal.Integer == 1);
             Assert.True(expression.FunctionCall == null);
             Assert.True(expression.Operator == null);
             Assert.True(expression.SubExpression == null);
+            Assert.True(expression.ParentExpression == null);
 
 
             txt = "1.0";
@@ -113,12 +114,13 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Identifier == null);
             Assert.True(expression.Literal.Real == 1.0);
             Assert.True(expression.FunctionCall == null);
             Assert.True(expression.Operator == null);
             Assert.True(expression.SubExpression == null);
+            Assert.True(expression.ParentExpression == null);
 
 
             txt = "false";
@@ -129,12 +131,13 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Identifier == null);
             Assert.True(expression.Literal.Bool == false);
             Assert.True(expression.FunctionCall == null);
             Assert.True(expression.Operator == null);
             Assert.True(expression.SubExpression == null);
+            Assert.True(expression.ParentExpression == null);
 
 
             txt = "\"asd899asd\"";
@@ -145,12 +148,13 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Identifier == null);
             Assert.True(expression.Literal.String == "asd899asd");
             Assert.True(expression.FunctionCall == null);
             Assert.True(expression.Operator == null);
             Assert.True(expression.SubExpression == null);
+            Assert.True(expression.ParentExpression == null);
 
 
             txt = "VarName";
@@ -161,12 +165,13 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Identifier == "VarName");
             Assert.True(expression.Literal == null);
             Assert.True(expression.FunctionCall == null);
             Assert.True(expression.Operator == null);
             Assert.True(expression.SubExpression == null);
+            Assert.True(expression.ParentExpression == null);
 
 
             txt = "VarName + 1+ true*0";
@@ -177,7 +182,7 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Identifier == "VarName");
             Assert.True(expression.Literal == null);
             Assert.True(expression.FunctionCall == null);
@@ -187,6 +192,10 @@ namespace BogieLangTests
             Assert.True(expression.SubExpression.SubExpression.Literal.Bool == true);
             Assert.True(expression.SubExpression.SubExpression.Operator == "*");
             Assert.True(expression.SubExpression.SubExpression.SubExpression.Literal.Integer == 0);
+            Assert.True(expression.ParentExpression == null);
+            Assert.True(expression.SubExpression.ParentExpression == expression);
+            Assert.True(expression.SubExpression.SubExpression.ParentExpression == expression.SubExpression);
+            Assert.True(expression.SubExpression.SubExpression.SubExpression.ParentExpression == expression.SubExpression.SubExpression);
 
 
             txt = "funcCall()";
@@ -197,12 +206,13 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Identifier == null);
             Assert.True(expression.Literal == null);
             Assert.True(expression.FunctionCall.Identifier == "funcCall");
             Assert.True(expression.Operator == null);
             Assert.True(expression.SubExpression == null);
+            Assert.True(expression.ParentExpression == null);
         }
 
         [Test]

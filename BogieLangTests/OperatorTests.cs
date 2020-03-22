@@ -27,7 +27,9 @@ namespace BogieLangTests
             BogieLangParser.ExpressionContext expressionContext = parser.expression();
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            Expression expression = Expression.Compile(expressionContext);
+            Expression expression = Expression.Compile(expressionContext, null);
+            Assert.True(expression.ParentExpression == null);
+            Assert.True(expression.SubExpression.ParentExpression == expression);
             Assert.True((int)expression.Execute(functionEnvironment, variableEnvironment) == 2);
 
             txt = "1+1+1";
@@ -38,7 +40,10 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
+            Assert.True(expression.ParentExpression == null);
+            Assert.True(expression.SubExpression.ParentExpression == expression);
+            Assert.True(expression.SubExpression.SubExpression.ParentExpression == expression.SubExpression);
             Assert.True((int)expression.Execute(functionEnvironment, variableEnvironment) == 3);
 
             txt = "1+1.1";
@@ -49,7 +54,9 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
+            Assert.True(expression.ParentExpression == null);
+            Assert.True(expression.SubExpression.ParentExpression == expression);
             Assert.True((double)expression.Execute(functionEnvironment, variableEnvironment) == 2.1);
 
             txt = "1+\"one\"";
@@ -60,7 +67,9 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
+            Assert.True(expression.ParentExpression == null);
+            Assert.True(expression.SubExpression.ParentExpression == expression);
             Assert.True((string)expression.Execute(functionEnvironment, variableEnvironment) == "1one");
 
             txt = "1+true";
@@ -71,7 +80,9 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
+            Assert.True(expression.ParentExpression == null);
+            Assert.True(expression.SubExpression.ParentExpression == expression);
             Assert.True((int)expression.Execute(functionEnvironment, variableEnvironment) == 2);
 
             txt = "1+1.1+true+\"str\"";
@@ -82,7 +93,11 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
+            Assert.True(expression.ParentExpression == null);
+            Assert.True(expression.SubExpression.ParentExpression == expression);
+            Assert.True(expression.SubExpression.SubExpression.ParentExpression == expression.SubExpression);
+            Assert.True(expression.SubExpression.SubExpression.SubExpression.ParentExpression == expression.SubExpression.SubExpression);
             Assert.True((string)expression.Execute(functionEnvironment, variableEnvironment) == "3.1str");
             
         }

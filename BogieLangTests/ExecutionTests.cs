@@ -89,8 +89,9 @@ namespace BogieLangTests
             BogieLangParser.ExpressionContext expressionContext = parser.expression();
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            Expression expression = Expression.Compile(expressionContext);
+            Expression expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Execute(functionEnvironment, new VariableEnvironment()) is int);
+            Assert.True(expression.ParentExpression == null);
             Assert.True((int)expression.Execute(functionEnvironment, new VariableEnvironment()) == 1);
 
 
@@ -102,8 +103,9 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Execute(functionEnvironment, new VariableEnvironment()) is double);
+            Assert.True(expression.ParentExpression == null);
             Assert.True((double)expression.Execute(functionEnvironment, new VariableEnvironment()) == 1.0);
 
 
@@ -115,8 +117,9 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Execute(functionEnvironment, new VariableEnvironment()) is bool);
+            Assert.True(expression.ParentExpression == null);
             Assert.True((bool)expression.Execute(functionEnvironment, new VariableEnvironment()) == false);
 
 
@@ -128,7 +131,7 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
             Assert.True(expression.Execute(functionEnvironment, new VariableEnvironment()) is string);
             Assert.True((string)expression.Execute(functionEnvironment, new VariableEnvironment()) == "asd899asd");
 
@@ -141,10 +144,11 @@ namespace BogieLangTests
             expressionContext = parser.expression();
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
+            expression = Expression.Compile(expressionContext, null);
             variableEnvironment.DeclareVariable(txt, BogieLangType.INTEGER);
             variableEnvironment.DefineVariable(txt, 1);
             Assert.True(expression.Execute(functionEnvironment, variableEnvironment) is int);
+            Assert.True(expression.ParentExpression == null);
             Assert.True((int)expression.Execute(functionEnvironment, variableEnvironment) == 1);
         }
 
