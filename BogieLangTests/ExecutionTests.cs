@@ -11,7 +11,6 @@ namespace BogieLangTests
 {
     class ExecutionTests
     {
-        FunctionEnvironment environment = new FunctionEnvironment();
         
         [Test]
         public void LiteralTests()
@@ -80,6 +79,7 @@ namespace BogieLangTests
         public void ExpressionTests()
         {
             VariableEnvironment variableEnvironment = new VariableEnvironment();
+            FunctionEnvironment functionEnvironment = new FunctionEnvironment();
 
             string txt = "1";
             AntlrInputStream inputStream = new AntlrInputStream(txt);
@@ -90,8 +90,8 @@ namespace BogieLangTests
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
             Expression expression = Expression.Compile(expressionContext);
-            Assert.True(expression.Execute(environment, new VariableEnvironment()) is int);
-            Assert.True((int)expression.Execute(environment, new VariableEnvironment()) == 1);
+            Assert.True(expression.Execute(functionEnvironment, new VariableEnvironment()) is int);
+            Assert.True((int)expression.Execute(functionEnvironment, new VariableEnvironment()) == 1);
 
 
             txt = "1.0";
@@ -103,8 +103,8 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
             expression = Expression.Compile(expressionContext);
-            Assert.True(expression.Execute(environment, new VariableEnvironment()) is double);
-            Assert.True((double)expression.Execute(environment, new VariableEnvironment()) == 1.0);
+            Assert.True(expression.Execute(functionEnvironment, new VariableEnvironment()) is double);
+            Assert.True((double)expression.Execute(functionEnvironment, new VariableEnvironment()) == 1.0);
 
 
             txt = "false";
@@ -116,8 +116,8 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
             expression = Expression.Compile(expressionContext);
-            Assert.True(expression.Execute(environment, new VariableEnvironment()) is bool);
-            Assert.True((bool)expression.Execute(environment, new VariableEnvironment()) == false);
+            Assert.True(expression.Execute(functionEnvironment, new VariableEnvironment()) is bool);
+            Assert.True((bool)expression.Execute(functionEnvironment, new VariableEnvironment()) == false);
 
 
             txt = "\"asd899asd\"";
@@ -129,8 +129,8 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(expressionContext);
             expression = Expression.Compile(expressionContext);
-            Assert.True(expression.Execute(environment, new VariableEnvironment()) is string);
-            Assert.True((string)expression.Execute(environment, new VariableEnvironment()) == "asd899asd");
+            Assert.True(expression.Execute(functionEnvironment, new VariableEnvironment()) is string);
+            Assert.True((string)expression.Execute(functionEnvironment, new VariableEnvironment()) == "asd899asd");
 
 
             txt = "VarName";
@@ -144,34 +144,15 @@ namespace BogieLangTests
             expression = Expression.Compile(expressionContext);
             variableEnvironment.DeclareVariable(txt, BogieLangType.INTEGER);
             variableEnvironment.DefineVariable(txt, 1);
-            Assert.True(expression.Execute(environment, variableEnvironment) is int);
-            Assert.True((int)expression.Execute(environment, variableEnvironment) == 1);
-
-            //todo: test operators when they are setup to be executed
-            /*txt = "VarName + 1+ true*0";
-            inputStream = new AntlrInputStream(txt);
-            lexer = new BogieLangLexer(inputStream);
-            commonTokenStream = new CommonTokenStream(lexer);
-            parser = new BogieLangParser(commonTokenStream);
-            expressionContext = parser.expression();
-            visitor = new BogieLangBaseVisitor<object>();
-            visitor.Visit(expressionContext);
-            expression = Expression.Compile(expressionContext);
-            Assert.True(expression.Identifier == "VarName");
-            Assert.True(expression.Literal == null);
-            Assert.True(expression.FunctionCall == null);
-            Assert.True(expression.Operator == "+");
-            Assert.True(expression.SubExpression.Literal.Integer == 1);
-            Assert.True(expression.SubExpression.Operator == "+");
-            Assert.True(expression.SubExpression.SubExpression.Literal.Bool == true);
-            Assert.True(expression.SubExpression.SubExpression.Operator == "*");
-            Assert.True(expression.SubExpression.SubExpression.SubExpression.Literal.Integer == 0);*/
+            Assert.True(expression.Execute(functionEnvironment, variableEnvironment) is int);
+            Assert.True((int)expression.Execute(functionEnvironment, variableEnvironment) == 1);
         }
 
         [Test]
         public void VarDefinitionTests()
         {
             VariableEnvironment variables = new VariableEnvironment();
+            FunctionEnvironment functionEnvironment = new FunctionEnvironment();
 
             variables.DeclareVariable("var", BogieLangType.INTEGER);
             string txt = "var=123";
@@ -183,7 +164,7 @@ namespace BogieLangTests
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(varDefinitionContext);
             VarDefinition varDefinition = VarDefinition.Compile(varDefinitionContext);
-            varDefinition.Execute(environment, variables);
+            varDefinition.Execute(functionEnvironment, variables);
             Assert.True(variables["var"].BogieLangType == BogieLangType.INTEGER);
             Assert.True(variables["var"].Value is int);
             Assert.True((int)variables["var"].Value == 123);
@@ -194,6 +175,7 @@ namespace BogieLangTests
         public void VarDeclarationTests()
         {
             VariableEnvironment variables = new VariableEnvironment();
+            FunctionEnvironment functionEnvironment = new FunctionEnvironment();
 
             string txt = "int var";
             AntlrInputStream inputStream = new AntlrInputStream(txt);
@@ -204,7 +186,7 @@ namespace BogieLangTests
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(varDeclarationContext);
             VarDeclaration varDeclaration = VarDeclaration.Compile(varDeclarationContext);
-            varDeclaration.Execute(environment, variables);
+            varDeclaration.Execute(functionEnvironment, variables);
             Assert.True(variables["var"].BogieLangType == BogieLangType.INTEGER);
             Assert.True(variables["var"].Value == null);
             Assert.True(variables["var"].Identifer == "var");
@@ -219,7 +201,7 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(varDeclarationContext);
             varDeclaration = VarDeclaration.Compile(varDeclarationContext);
-            varDeclaration.Execute(environment, variables);
+            varDeclaration.Execute(functionEnvironment, variables);
             Assert.True(variables["var"].BogieLangType == BogieLangType.INTEGER);
             Assert.True((int)variables["var"].Value == 123);
             Assert.True(variables["var"].Identifer == "var");
@@ -229,6 +211,7 @@ namespace BogieLangTests
         public void FunctionReturnTests()
         {
             VariableEnvironment variables = new VariableEnvironment();
+            FunctionEnvironment functionEnvironment = new FunctionEnvironment();
             variables.DeclareVariable("abc", BogieLangType.BOOL);
             variables.DefineVariable("abc", true);
 
@@ -241,7 +224,7 @@ namespace BogieLangTests
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(functionReturnContext);
             FunctionReturn functionReturn = FunctionReturn.Compile(functionReturnContext);
-            Assert.True((bool)functionReturn.Execute(environment, variables) == true);
+            Assert.True((bool)functionReturn.Execute(functionEnvironment, variables) == true);
 
             variables.Clear();
             txt = "return 10.0";
@@ -253,13 +236,14 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(functionReturnContext);
             functionReturn = FunctionReturn.Compile(functionReturnContext);
-            Assert.True((double)functionReturn.Execute(environment, variables) == 10.0);
+            Assert.True((double)functionReturn.Execute(functionEnvironment, variables) == 10.0);
         }
 
         [Test]
         public void BodyTests()
         {
             VariableEnvironment variables = new VariableEnvironment();
+            FunctionEnvironment functionEnvironment = new FunctionEnvironment();
 
             string txt = "int b=true";
             AntlrInputStream inputStream = new AntlrInputStream(txt);
@@ -272,7 +256,7 @@ namespace BogieLangTests
             Body body = Body.Compile(bodyContext);
             try
             {
-                body.Execute(environment, variables);
+                body.Execute(functionEnvironment, variables);
                 Assert.True(false);
             }
             catch(Exception e)
@@ -290,7 +274,7 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(bodyContext);
             body = Body.Compile(bodyContext);
-            body.Execute(environment, variables);
+            body.Execute(functionEnvironment, variables);
             Assert.True(variables["b"].BogieLangType == BogieLangType.INTEGER);
             Assert.True(variables["b"].Identifer == "b");
             Assert.True((int)variables["b"].Value == 98);
@@ -306,7 +290,7 @@ namespace BogieLangTests
             body = Body.Compile(bodyContext);
             try
             {
-                Assert.True(body.Execute(environment, variables) == null);
+                Assert.True(body.Execute(functionEnvironment, variables) == null);
                 Assert.True(false);
             }
             catch
@@ -325,7 +309,7 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(bodyContext);
             body = Body.Compile(bodyContext);
-            body.Execute(environment, variables);
+            body.Execute(functionEnvironment, variables);
             Assert.True(variables["abc"].BogieLangType == BogieLangType.INTEGER);
             Assert.True(variables["abc"].Identifer == "abc");
             Assert.True((int)variables["abc"].Value == 123);
@@ -340,8 +324,8 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(bodyContext);
             body = Body.Compile(bodyContext);
-            Assert.True(body.Execute(environment, variables) is int);
-            Assert.True((int)body.Execute(environment, variables) == 0);
+            Assert.True(body.Execute(functionEnvironment, variables) is int);
+            Assert.True((int)body.Execute(functionEnvironment, variables) == 0);
 
             txt = "if(1){int b}";
             inputStream = new AntlrInputStream(txt);
@@ -352,7 +336,7 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(bodyContext);
             body = Body.Compile(bodyContext);
-            body.Execute(environment, variables);
+            body.Execute(functionEnvironment, variables);
 
             txt = "if(true){int b}";
             inputStream = new AntlrInputStream(txt);
@@ -363,13 +347,14 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(bodyContext);
             body = Body.Compile(bodyContext);
-            body.Execute(environment, variables);
+            body.Execute(functionEnvironment, variables);
         }
 
         [Test]
         public void IfTests()
         {
             VariableEnvironment variables = new VariableEnvironment();
+            FunctionEnvironment functionEnvironment = new FunctionEnvironment();
 
             string txt = "if(true){}";
             AntlrInputStream inputStream = new AntlrInputStream(txt);
@@ -380,7 +365,7 @@ namespace BogieLangTests
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(ifControlContext);
             IfControl ifControl = IfControl.Compile(ifControlContext);
-            Assert.True(ifControl.Execute(environment, variables) == null);
+            Assert.True(ifControl.Execute(functionEnvironment, variables) == null);
 
 
 
@@ -393,7 +378,7 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(ifControlContext);
             ifControl = IfControl.Compile(ifControlContext);
-            Assert.True(ifControl.Execute(environment, variables) == null);
+            Assert.True(ifControl.Execute(functionEnvironment, variables) == null);
             Assert.True(!variables.IsVariableDeclared("b"));
         }
 
@@ -401,6 +386,7 @@ namespace BogieLangTests
         public void WhileTests()
         {
             VariableEnvironment variables = new VariableEnvironment();
+            FunctionEnvironment functionEnvironment = new FunctionEnvironment();
             variables.DeclareVariable("loop", BogieLangType.BOOL);
             variables.DefineVariable("loop", true);
 
@@ -413,7 +399,7 @@ namespace BogieLangTests
             BogieLangBaseVisitor<object> visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(whileControlContext);
             WhileControl whileControl = WhileControl.Compile(whileControlContext);
-            Assert.True(whileControl.Execute(environment, variables) == null);
+            Assert.True(whileControl.Execute(functionEnvironment, variables) == null);
             Assert.True((bool)variables["loop"].Value == false);
             
 
@@ -427,7 +413,7 @@ namespace BogieLangTests
             visitor = new BogieLangBaseVisitor<object>();
             visitor.Visit(whileControlContext);
             whileControl = WhileControl.Compile(whileControlContext);
-            Assert.True(whileControl.Execute(environment, variables) == null);
+            Assert.True(whileControl.Execute(functionEnvironment, variables) == null);
             Assert.True((bool)variables["loop"].Value == false);
             Assert.True(!variables.IsVariableDeclared("b"));
             
@@ -540,6 +526,29 @@ bool func(bool b)
             Program program = Program.Compile(programContext);
 
             Assert.True((bool)program.Execute() == false);
+
+
+            txt = @"
+int Main()
+{
+    return fibonacci(8)
+}
+
+int fibonacci(int n)
+{
+    if(n==0){return 0}
+    if(n==1){return 1}
+    return fibonacci(n-2)+fibonacci(n-1)
+}";
+            inputStream = new AntlrInputStream(txt);
+            lexer = new BogieLangLexer(inputStream);
+            commonTokenStream = new CommonTokenStream(lexer);
+            parser = new BogieLangParser(commonTokenStream);
+            programContext = parser.program();
+            visitor = new BogieLangBaseVisitor<object>();
+            visitor.Visit(programContext);
+            program = Program.Compile(programContext);
+            Assert.True((int)program.Execute() == 21);
         }
     }
 }

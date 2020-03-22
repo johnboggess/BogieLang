@@ -47,10 +47,24 @@ namespace BogieLang.Runtime
 
         public object Execute(FunctionEnvironment functionEnvironment, VariableEnvironment variableEnvironment)
         {
-            if (Identifier != null) { return variableEnvironment.GetVariableValue(Identifier); }
-            else if (Literal != null) { return Literal.Execute(); }
-            else if (FunctionCall != null) { return FunctionCall.Execute(functionEnvironment, variableEnvironment); }
-            else { throw new Exception("Unknown expression"); }
+            if (SubExpression == null)
+            {
+                if (Identifier != null) { return variableEnvironment.GetVariableValue(Identifier); }
+                else if (Literal != null) { return Literal.Execute(); }
+                else if (FunctionCall != null) { return FunctionCall.Execute(functionEnvironment, variableEnvironment); }
+                else { throw new Exception("Unknown expression"); }
+            }
+            else
+            {
+                object left;
+                if (Identifier != null) { left = variableEnvironment.GetVariableValue(Identifier); }
+                else if (Literal != null) { left = Literal.Execute(); }
+                else if (FunctionCall != null) { left = FunctionCall.Execute(functionEnvironment, variableEnvironment); }
+                else { throw new Exception("Unknown expression"); }
+
+                object right = SubExpression.Execute(functionEnvironment, variableEnvironment);
+                return Operators.OperatorHelper.Execute(Operator, left, right);
+            }
         }
 
         public static Expression Compile(BogieLangParser.ExpressionContext expressionContext)
